@@ -1,0 +1,49 @@
+{
+  "name": "intellij-assignment",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "Playwright",
+    "BDD",
+    "Cucumber",
+    "Page Object Model",
+    "Fixtures"
+  ],
+  "author": "serhat.gemici",
+  "license": "ISC",
+  "imports": {
+    "#e2e/*": "./e2e/*"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "open:local:watch": "run-p watch open:local",
+    "open:dev:watch": "run-p watch open:dev",
+    "open:stage:watch": "run-p watch open:stage",
+    "test:dev": "run-s -c delete:allure:results bddgen cross:env:dev",
+    "test:stage": "run-s -c delete:allure:results bddgen cross:env:stage",
+    "test:local": "run-s -c delete:allure:results bddgen cross:env:local",
+    "test:dev:report": "run-s -c test:dev allure",
+    "test:stage:report": "run-s -c test:stage allure",
+    "test:local:report": "run-s -c test:local allure",
+    "open:local": "playwright test --ui --project=Local",
+    "open:dev": "playwright test --ui --project=Develop",
+    "open:stage": "playwright test --ui --project=Stage",
+    "watch": "nodemon -w ./e2e/Features -w ./e2e/StepDefinitions -e ts,feature --exec \"npx bddgen\"",
+    "bddgen": "npx bddgen",
+    "allure": "allure generate allure-results -o allure-report --clean && allure open",
+    "delete:allure:results": "npx del-cli allure-results",
+    "cross:env:dev": "cross-env playwright test --project=Develop",
+    "cross:env:stage": "cross-env playwright test --project=Stage",
+    "cross:env:local": "cross-env playwright test --project=Local"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.0",
+    "@playwright/test": "^1.56.0",
+    "allure-playwright": "^3.4.1",
+    "cross-env": "^10.1.0",
+    "del-cli": "^7.0.0",
+    "nodemon": "^3.1.10",
+    "npm-run-all": "^4.1.5",
+    "playwright-bdd": "^8.4.1"
+  }
+}

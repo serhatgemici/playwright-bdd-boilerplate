@@ -1,0 +1,4 @@
+- radio "Yearly save 2 months" [checked]
+- text: Yearly save 2 months
+- radio "Monthly"
+- text: Monthly

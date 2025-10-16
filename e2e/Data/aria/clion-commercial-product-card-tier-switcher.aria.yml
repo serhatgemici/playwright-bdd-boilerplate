@@ -1,0 +1,8 @@
+- button "Individuals":
+  - img:
+    - img
+  - text: Individuals
+- button "Organizations":
+  - img:
+    - img
+  - text: Organizations

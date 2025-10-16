@@ -1,0 +1,22 @@
+# Generated tests
+.features-gen
+  
+# IDE
+.idea/
+.vscode/
+
+# dependencies
+node_modules/
+
+# log files
+npm-debug.log
+yarn-error.log
+.DS_Store
+.gitkeep
+
+#test results and reports
+test-results
+playwright-report
+allure-report
+allure-results
+
