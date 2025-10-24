@@ -1,7 +1,6 @@
-import { expect, Page, Locator } from '@playwright/test';
+import { Page } from '@playwright/test';
 
 class BasePage {
-
   page: Page;
 
   constructor(page: Page) {
@@ -27,20 +26,19 @@ class BasePage {
 
   checkForCriticalConsoleErrors() {
     const criticalErrors: string[] = [];
-    this.page.on('console', msg => {
+    this.page.on('console', (msg) => {
       if (msg.type() === 'error') {
         const text = msg.text();
         criticalErrors.push(text);
       }
     });
-    
+
     if (criticalErrors.length > 0) {
       throw new Error(`Critical console errors found: \n${criticalErrors.join('\n')}`);
-    }
-    else {
+    } else {
       console.log('No critical console errors found.');
     }
   }
 }
 
-export default BasePage; 
+export default BasePage;
