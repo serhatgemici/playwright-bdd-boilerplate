@@ -41,26 +41,26 @@ const config: PlaywrightTestConfig = defineConfig({
     {
       name: 'Develop',
       use: { 
-        ...devices[process.env.DEVICE || 'Desktop Chrome'], 
-        baseURL: process.env.BASE_URL || 'https://www.jetbrains.com', },
+        ...devices['Desktop Chrome'], 
+        baseURL: 'https://www.jetbrains.com', },
     },
     {
       name: 'Stage',
       use: { 
-        ...devices[process.env.DEVICE || 'Desktop Chrome'], 
-        baseURL: process.env.BASE_URL || 'https://www.jetbrains.com', },
+        ...devices['Desktop Chrome'], 
+        baseURL: 'https://www.jetbrains.com', },
     },
     {
       name: 'Local',
       use: { 
-        ...devices[process.env.DEVICE || 'Desktop Chrome'], 
-        baseURL: process.env.BASE_URL || 'https://www.jetbrains.com', },
+        ...devices['Desktop Chrome'], 
+        baseURL: 'https://www.jetbrains.com', },
     },
     {
       name: 'Production',
       use: { 
-        ...devices[process.env.DEVICE || 'Desktop Chrome'], 
-        baseURL: process.env.BASE_URL || 'https://www.jetbrains.com', },
+        ...devices['Desktop Chrome'], 
+        baseURL: 'https://www.jetbrains.com', },
     }
   ],
 
