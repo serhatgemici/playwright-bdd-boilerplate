@@ -1,14 +1,16 @@
-import { test as base } from 'playwright-bdd';
+import { test as base, createBdd } from 'playwright-bdd';
 
 import BasePage from '#e2e/Pages/BasePage';
 import CookieConsentDialog from '#e2e/Pages/CookieConsentDialog';
 import BuyPage from '#e2e/Pages/BuyPage';
 
-export const test = base.extend<{
+type Fixtures = {
   basePage: BasePage;
   cookieConsentDialog: CookieConsentDialog;
   buyPage: BuyPage;
-}>({
+};
+
+export const test = base.extend<Fixtures>({
   basePage: async ({ page }, use) => {
     const basePage = new BasePage(page);
     await use(basePage);
@@ -22,4 +24,6 @@ export const test = base.extend<{
     await use(buyPage);
   },
 });
+
+export const { Given, When, Then } = createBdd(test);
 export const expect = base.expect;

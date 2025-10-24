@@ -1,7 +1,4 @@
-import { createBdd } from 'playwright-bdd';
-import { test } from '#e2e/Fixtures/FixturesBDD.js';
-
-const { Then } = createBdd(test);
+import { Then } from '#e2e/Fixtures/FixturesBDD.ts';
 
 Then('heading displays {string}', async ({ buyPage }, headingText: string) => {
   await buyPage.validateHeading(headingText);

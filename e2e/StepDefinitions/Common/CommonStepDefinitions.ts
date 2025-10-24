@@ -1,7 +1,4 @@
-import { createBdd } from 'playwright-bdd';
-import { test } from '#e2e/Fixtures/FixturesBDD.ts';
-
-const { Given, When, Then } = createBdd(test);
+import { Given, When, Then } from '#e2e/Fixtures/FixturesBDD.ts';
 
 When('cookie consent dialog is {string}', async ({ cookieConsentDialog }, dialogState: string) => {
   await cookieConsentDialog.validateCookieConsentDailogState(dialogState);
