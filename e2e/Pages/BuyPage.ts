@@ -1,5 +1,5 @@
 import { expect, Page, Locator } from '@playwright/test';
-import { readAriaSnapshot } from '../../utils/readAriaSnapshot';
+import { readAriaSnapshot } from 'utils/readAriaSnapshot';
 
 const BILLING_LABELS = ['Monthly billing', 'Yearly billing'];
 const TIER_LABELS = ['For Individual Use', 'For Organizations'];

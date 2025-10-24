@@ -1,6 +1,6 @@
 import { expect, Page, Locator } from '@playwright/test';
 
-import BasePage from './BasePage';
+import BasePage from '#e2e/Pages/BasePage';
 
 class CookieConsentOverlay {
   page: Page;

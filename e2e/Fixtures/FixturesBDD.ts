@@ -1,8 +1,8 @@
 import { test as base } from 'playwright-bdd';
 
-import BasePage from '../Pages/BasePage';
-import CookieConsentDialog from '../Pages/CookieConsentDialog';
-import BuyPage from '../Pages/BuyPage';
+import BasePage from '#e2e/Pages/BasePage';
+import CookieConsentDialog from '#e2e/Pages/CookieConsentDialog';
+import BuyPage from '#e2e/Pages/BuyPage';
 
 export const test = base.extend<{
   basePage: BasePage;
