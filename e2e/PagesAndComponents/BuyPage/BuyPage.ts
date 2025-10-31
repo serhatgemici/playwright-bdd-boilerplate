@@ -38,21 +38,21 @@ class BuyPage {
 
   async validateCommonTierSwitcher(productName: string) {
     switch (productName) {
-      case 'idea': {
+      case commonConstants.PRODUCT_NAMES.IDEA: {
         await this.validateCommonAdaptiveSwitcher(
           [...buyPageConstants.TIER_LABELS],
           'idea-common-tier-switcher.aria.yml'
         );
         break;
       }
-      case 'rustRover': {
+      case commonConstants.PRODUCT_NAMES.RUSTROVER: {
         await this.validateCommonAdaptiveSwitcher(
           [...buyPageConstants.TIER_LABELS],
           'rustrover-common-tier-switcher.aria.yml'
         );
         break;
       }
-      case 'cLion': {
+      case commonConstants.PRODUCT_NAMES.CLION: {
         await expect(
           this.commonAdaptiveSwitcherLocator([...buyPageConstants.TIER_LABELS])
         ).not.toBeVisible();
@@ -60,23 +60,23 @@ class BuyPage {
       }
       default:
         throw new Error(
-          `Invalid product name: ${productName}. Valid product names are "idea", "rustRover", or "cLion".`
+          `Invalid product name: ${productName}. Valid product names are "${commonConstants.PRODUCT_NAMES.IDEA}", "${commonConstants.PRODUCT_NAMES.RUSTROVER}", or "${commonConstants.PRODUCT_NAMES.CLION}".`
         );
     }
   }
 
   async validateBillingTermSwitcher(productName: string) {
     switch (productName) {
-      case 'idea':
+      case commonConstants.PRODUCT_NAMES.IDEA:
         await this.validateCommonAdaptiveSwitcher(
           [...buyPageConstants.BILLING_LABELS],
           'idea-billing-term-switcher.aria.yml'
         );
         break;
-      case 'rustRover':
+      case commonConstants.PRODUCT_NAMES.RUSTROVER:
         await this.validateBillingTypeRadioGroup('rustrover-billing-type-radio-group.aria.yml');
         break;
-      case 'cLion':
+      case commonConstants.PRODUCT_NAMES.CLION:
         await this.validateCommonAdaptiveSwitcher(
           [...buyPageConstants.BILLING_LABELS],
           'clion-billing-term-switcher.aria.yml'
@@ -84,7 +84,7 @@ class BuyPage {
         break;
       default:
         throw new Error(
-          `Invalid product name: ${productName}. Valid product names are "idea", "rustRover", or "cLion".`
+          `Invalid product name: ${productName}. Valid product names are "${commonConstants.PRODUCT_NAMES.IDEA}", "${commonConstants.PRODUCT_NAMES.RUSTROVER}", or "${commonConstants.PRODUCT_NAMES.CLION}".`
         );
     }
   }
@@ -114,7 +114,7 @@ class BuyPage {
 
   async validateDefaultStateOfProductCards(productName: string) {
     switch (productName) {
-      case 'idea':
+      case commonConstants.PRODUCT_NAMES.IDEA:
         await this.validateIdeaProductCard(
           buyPageConstants.PRODUCT_CARD_TITLES.INTELLIJ_IDEA_ULTIMATE,
           buyPageConstants.TIER_TYPES.COMMERCIAL,
@@ -126,7 +126,7 @@ class BuyPage {
           buyPageConstants.BILLING_TERMS.YEARLY
         );
         break;
-      case 'rustRover':
+      case commonConstants.PRODUCT_NAMES.RUSTROVER:
         await this.validateRustRoverProductCard(
           buyPageConstants.PRODUCT_CARD_TITLES.RUSTROVER_NON_COMMERCIAL,
           buyPageConstants.TIER_TYPES.PERSONAL,
@@ -148,7 +148,7 @@ class BuyPage {
           buyPageConstants.BILLING_TERMS.YEARLY
         );
         break;
-      case 'cLion':
+      case commonConstants.PRODUCT_NAMES.CLION:
         await this.validateCLionProductCard(
           buyPageConstants.PRODUCT_CARD_TITLES.CLION_NON_COMMERCIAL,
           buyPageConstants.TIER_TYPES.PERSONAL,
@@ -167,7 +167,7 @@ class BuyPage {
         break;
       default:
         throw new Error(
-          `Invalid product name: ${productName}. Valid product names are "idea", "rustRover", or "cLion".`
+          `Invalid product name: ${productName}. Valid product names are "${commonConstants.PRODUCT_NAMES.IDEA}", "${commonConstants.PRODUCT_NAMES.RUSTROVER}", or "${commonConstants.PRODUCT_NAMES.CLION}".`
         );
     }
   }
