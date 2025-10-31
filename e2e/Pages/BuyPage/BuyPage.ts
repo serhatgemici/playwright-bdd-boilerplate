@@ -1,8 +1,8 @@
 import { expect, Page, Locator } from '@playwright/test';
 import { readAriaSnapshot } from 'utils/readAriaSnapshot';
-import * as buyPageLocatorFactory from '#e2e/Pages/BuyPageLocatorFactory';
-import * as buyPageConstants from '#e2e/Pages/BuyPageConstants';
-import * as commonConstants from '#e2e/Pages/CommonConstants';
+import * as buyPageLocatorFactory from './BuyPageLocatorFactory';
+import * as buyPageConstants from './BuyPageConstants';
+import * as commonConstants from '../Common/CommonConstants';
 
 type TierType = (typeof buyPageConstants.TIER_TYPES)[keyof typeof buyPageConstants.TIER_TYPES];
 type BillingTerm =

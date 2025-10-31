@@ -1,5 +1,5 @@
 import { Page, Locator } from '@playwright/test';
-import { PRODUCT_CARD_TITLES } from '#e2e/Pages/BuyPageConstants';
+import { PRODUCT_CARD_TITLES } from './BuyPageConstants';
 
 // Selector Constants
 export const SELECTORS = {
