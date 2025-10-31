@@ -1,8 +1,8 @@
 import { test as base, createBdd } from 'playwright-bdd';
 
-import BasePage from '#e2e/Pages/Common/BasePage';
-import CookieConsentDialog from '#e2e/Pages/CookieConsentDialog/CookieConsentDialog';
-import BuyPage from '#e2e/Pages/BuyPage/BuyPage';
+import BasePage from '#e2e/PagesAndComponents/Common/BasePage';
+import CookieConsentDialog from '#e2e/PagesAndComponents/CookieConsentDialog/CookieConsentDialog';
+import BuyPage from '#e2e/PagesAndComponents/BuyPage/BuyPage';
 
 type Fixtures = {
   basePage: BasePage;
