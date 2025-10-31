@@ -4,24 +4,23 @@ import BasePage from '#e2e/Pages/BasePage';
 
 class CookieConsentOverlay {
   page: Page;
+  // External page objects properties declarations
   basePage: BasePage;
-  cookieConsentDialogHeading: Locator;
-  ablehnenEinstellungenButton: Locator;
-  acceptAllButton: Locator;
+  // Locator properties declarations
+  readonly cookieConsentDialogHeading: Locator;
+  readonly ablehnenEinstellungenButton: Locator;
+  readonly acceptAllButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    // PAGE OBJECTS
+    // External page objects initializations
     this.basePage = new BasePage(page);
 
-    // LOCATORS
+    // Locator properties initializations & assignments
     this.cookieConsentDialogHeading = page.getByRole('heading', { name: 'Cookie Settings' });
     this.ablehnenEinstellungenButton = page.getByTestId('uc-more-button');
     this.acceptAllButton = page.getByRole('button', { name: 'Accept All' });
-
-    // PROPERTIES
-    // List properties here
   }
 
   // METHODS
