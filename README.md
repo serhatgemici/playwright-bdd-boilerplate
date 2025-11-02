@@ -32,8 +32,6 @@ Comprehensive guides are available in the `docs/` folder:
 
 ### Opening The Project
 
-### Opening The Project
-
 The `qa.code-workspace` file contains required configurations and plugins for VS Code to recognize and link feature files & step definitions. Open the project from this file in VS Code and accept the prompt for installing required extensions. This setup enables seamless navigation between feature files and step definitions.
 
 ### Installation
