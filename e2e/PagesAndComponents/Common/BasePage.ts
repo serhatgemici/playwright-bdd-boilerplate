@@ -1,4 +1,6 @@
-import { Page } from '@playwright/test';
+import { expect, Page, Locator } from '@playwright/test';
+import * as commonConstants from './CommonConstants';
+import { readAriaSnapshot } from '../../../utils/readAriaSnapshot';
 
 class BasePage {
   page: Page;
@@ -38,6 +40,27 @@ class BasePage {
     } else {
       console.log('No critical console errors found.');
     }
+  }
+
+  async validateHeading(expectedText: string): Promise<void> {
+    await expect(this.page.getByRole('heading', { level: 1 })).toHaveText(expectedText);
+  }
+
+  async validateElementDisplayed(locator: Locator, state: string): Promise<void> {
+    if (state === commonConstants.DISPLAYED) {
+      await expect(locator).toBeVisible();
+    } else if (state === commonConstants.NOT_DISPLAYED) {
+      await expect(locator).toBeHidden();
+    } else {
+      throw new Error(
+        `Invalid state: ${state}. Valid states are "${commonConstants.DISPLAYED}" or "${commonConstants.NOT_DISPLAYED}".`
+      );
+    }
+  }
+
+  async validateAriaSnapshot(locator: Locator, ariaFileName: string): Promise<void> {
+    const snapshot = await readAriaSnapshot(ariaFileName);
+    await expect(locator).toMatchAriaSnapshot(snapshot);
   }
 }
 

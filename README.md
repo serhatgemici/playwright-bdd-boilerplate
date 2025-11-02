@@ -1,135 +1,323 @@
-# Introduction 
->The solution uses [playwright-bdd](https://vitalets.github.io/playwright-bdd/#/) framework.
+# Playwright BDD Test Automation Framework
 
-# Pre-requisits
-1. [Node.js and npm installed](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) (required)
-2. [Java JDK](https://www.oracle.com/java/technologies/downloads/) is installed (optional for running the tests, required for displaying Allure report)
-3. [Allure Report](https://allurereport.org/docs/install/) is installed (optional for running the tests, required for displaying Allure report)
+> A clean, scalable test automation framework using [playwright-bdd](https://vitalets.github.io/playwright-bdd/#/) with inheritance-based architecture and centralized locator management.
 
-# Opening The Project 
- `qa.code-workspace` file contains the required configurations and plugins for VS Code to recognise and link feature files & step definitions together. Please open the project from this file in VS Code and accept the VS Code prompt for installing the required extensions. This setup will allow your IDE to recognise the feature files and let you CMD + click and display step definitions seamlessly.
+## 🏗️ Architecture Overview
 
-# Installation:
-1. Open the project using the `qa.code-workspace` file, then open Terminal and go to project root
+This framework implements a **clean inheritance hierarchy** with **abstract method contracts** and **centralized locator management** to eliminate code duplication and ensure consistent behavior across all test implementations.
 
-2. Install node modules
-```
+### Key Architectural Patterns
+
+- **Inheritance Chain**: `BasePage` → `BaseBuyPage` → Product-specific pages
+- **Abstract Method Contracts**: Enforced implementation of validation methods
+- **Locator Factory Pattern**: Centralized management via `BuyPageLocatorFactory`
+- **Constants Management**: UI text, product codes, and ARIA snapshots in dedicated files
+
+## 📚 Documentation
+
+Comprehensive guides are available in the `docs/` folder:
+
+- **[Writing New Tests](docs/WRITING_NEW_TESTS.md)** - Complete guide for creating new tests with inheritance patterns
+- **[Testing Strategy](docs/TESTING_STRATEGY.md)** - Architecture principles and team guidelines
+- **[Locator Strategy](docs/LOCATOR_STRATEGY.md)** - Centralized locator management and best practices
+- **[Refactoring Summary](docs/REFACTORING_SUMMARY.md)** - Evolution of the codebase architecture
+
+## Prerequisites
+
+1. **[Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)** (required)
+2. **[Java JDK](https://www.oracle.com/java/technologies/downloads/)** (optional for tests, required for Allure reports)
+3. **[Allure Report](https://allurereport.org/docs/install/)** (optional for tests, required for displaying reports)
+
+## 🚀 Getting Started
+
+### Opening The Project
+
+### Opening The Project
+
+The `qa.code-workspace` file contains required configurations and plugins for VS Code to recognize and link feature files & step definitions. Open the project from this file in VS Code and accept the prompt for installing required extensions. This setup enables seamless navigation between feature files and step definitions.
+
+### Installation
+
+1. Open the project using the `qa.code-workspace` file, then open Terminal and navigate to project root
+
+2. Install node modules:
+
+```bash
 npm i
 ```
-3. Install Playwright browsers (in case you have an older version of Playwright installed)
-```
+
+3. Install Playwright browsers:
+
+```bash
 npx playwright install
 ```
-# To run the test
-1. open terminal within the project root, type the following command and hit enter:
-``` 
-npm run open:dev:watch
-```
-This will do the following:
-- generate spec files from the feature files listed under Features folder and place them under the `.features.gen` directory, 
-- start the [Playwright Trace Viever](https://playwright.dev/docs/trace-viewer-intro)
-- watch for file changes and reload the code into the test runner on file changes.
 
-2. click play button
-3. When using open mode, please use control + c in termimal to terminate the execution.
+## 🧪 Running Tests
 
-Or,
+### Interactive Mode (Recommended for Development)
 
-execute 
-``` 
-npm run test:dev:report
-```
-and this will run the tests in headless mode, generate Allure Report and serve it on your browser. Alternatively, you can use the built in test explorer in VS Code. 
-
-**package.json** file contains a few pre-configured command scripts in the below fashion; **"test"** scripts run in headless mode in the background and only generate console output and report files, where **"open"** scripts run in trace viewer for debugging in interactable UI mode, and do not generate report files.
-``` 
-action:environment:option
-```
-**Where**
-- **action** can be one of the 2 execution options that are **test** and **open**
-- **environment** can be **dev**, **stage**, **local** (currently all options are configured for the same `https://www.jetbrains.com` url)
-- **option** can be a further parameter for the tests, such e.g. watch means the runner will watch for file changes and reload the code and re-run the tests in the test runner.
-
-**e.g.**
-``` 
-npm run test:dev:report
-or
+```bash
 npm run open:dev:watch
 ```
 
-# Project Structure
-The project uses page object pattern. Feature files and step definitions are expected to be under `e2e/Features` directory, and same way the step definition files of the corresponding Feature files are expected to be under `e2e/StepDefinitions` directory; where Page objects are placed under the `e2e/Pages` directory, common step definitions are placed under the `StepDefinitions/Common` directory in `CommonStepDefinitions.ts` file.
+This will:
 
-``` 
-/home/john.doe/my-project
-├── .features-gen/
-├── allure-report
-├── allure-results
-|
-├── e2e/
-|   ├── Data/
-|   |
-│   ├── Features/
-│   │   ├── @FirstFeature.feature
-│   │   └── @SecondFeature.feature
-│   │
-|   ├── Fixtures/
-│   │   └── FixturesBDD.js
-|   |
-│   ├── Pages/
-│   |   ├── ThisPage.js
-│   |   └── ThatPage.js
-|   |
-│   └── StepDefinitions/
-│       ├── @FirstFeature.js
-│       └── @SecondFeature.js
-|       └── Common/
-|           └── CommonStepDefinitions.js
-|   
-├── test-results/
-└── utils/
+- Generate spec files from feature files and place them in `.features.gen` directory
+- Start the [Playwright Trace Viewer](https://playwright.dev/docs/trace-viewer-intro)
+- Watch for file changes and reload code automatically
+
+Click the play button to run tests. Use **Ctrl + C** in terminal to terminate execution.
+
+### Headless Mode with Reports
+
+```bash
+npm run test:dev:report
 ```
 
-Step definitions which can be used in more than one feature are moved/placed into the `CommonStepDefinitions.ts` to be shared by multiple tests and to avoid code repetition. 
+This runs tests in headless mode, generates Allure reports, and serves them in your browser.
 
-Page objects are kept in `Pages` folder under `e2e` directory and are written in `Page Object Model` manner; that is: `BasePage` contains the common objects and methods that will be used in every page. e.g. header objects, landing page, common popups etc. Every other page must have their own Page files and they can extend base page if they need to access common methods, in order to avoid code repetition.
+### Available Commands
 
-**Directory Descriptions:**
-- `DATA` contains the auxiliary files that contains data to be used in the tests. e.g. json files for request samples.
-- `FEATURES` contains test suite, namely the `.feature` files.
-- `FIXTURES` contains test fixture files
-- `PAGES` contains the page files for page-object-model
-- `STEPDEFINITIONS` contains the step definition files for cucumber tests.
-- `STEPDEFINITIONS/COMMON` contains the common step definitions file.
-- `UTILS` contains helper scripts.
+Commands follow the pattern: `action:environment:option`
 
-# Test Reports
-The solution is currently configured with the Allure reporter.
+- **action**: `test` (headless) or `open` (interactive)
+- **environment**: `dev`, `stage`, `local` (currently all point to `https://www.jetbrains.com`)
+- **option**: Additional parameters like `watch` or `report`
 
-**How to manually generate Allure reports**
-1. Run the tests (e.g. npm run test:dev). This will create an `allure-results` folder in  project root. 
-2. Generate the allure report using the following command: `allure generate allure-results -o allure-report --clean` This will generate the `allure-report` folder in project root.
-3. Open the Allure report using the following command: `allure open allure-report`
+Examples:
 
-# Custom Tags
-Custom tags can be added into the Feature files on the following sections/levels: 
-- Feature
-- Rule
-- Scenario
-- Scenario Outline
-- Examples
-and are used to indicate that they belong to a certain group of tests in a custom fashion e.g. `@checkoutOld`, `@NewLoginChanges`, `@smoke`, `@positive` etc. for filtering them on execution time.
-
-
-E.g. `TAGS: @smoke` means, only the tests which are tagged as `@smoke` will be executed.
-
-```
-Tags can be used with and,or,not keywords.
+```bash
+npm run test:dev:report    # Headless with report
+npm run open:dev:watch     # Interactive with file watching
 ```
 
-E.g. `TAGS: "not @extras"` will run all the tests, except for the ones tagged as `@extras`
+## 🏗️ Project Architecture
 
-# Smart Tags (@skip, @only)
-Predefined tags `@skip` and `@only`
-  - `@skip` tag, skips a test.
-  - `@only` tag, runs only the test with the `@only` tag.
+### Inheritance-Based Structure
+
+```
+e2e/
+├── Data/
+│   └── aria/                                    # ARIA snapshot files for validation
+├── Features/
+│   └── @BuyPageOperations.feature               # BDD feature files
+├── Fixtures/
+│   └── FixturesBDD.ts                           # Test fixtures
+├── PagesAndComponents/                          # Clean inheritance hierarchy
+│   ├── Common/
+│   │   ├── BasePage.ts                          # Core page functionality (ALL pages extend this)
+│   │   └── CommonConstants.ts                   # Shared constants
+│   ├── BuyPage/
+│   │   ├── BaseBuyPage.ts                       # Abstract base with method contracts
+│   │   ├── IdeaBuyPage.ts                       # IntelliJ IDEA implementation
+│   │   ├── RustRoverBuyPage.ts                  # RustRover implementation
+│   │   ├── CLionBuyPage.ts                      # CLion implementation
+│   │   ├── BuyPageFactory.ts                    # Factory and convenience methods
+│   │   ├── BuyPageConstants.ts                  # UI text, product codes, ARIA snapshots
+│   │   └── BuyPageLocatorFactory.ts             # Centralized locator management
+│   └── CookieConsentDialog/
+│       └── CookieConsentDialog.ts               # Cookie dialog handling
+└── StepDefinitions/
+    ├── @BuyPageOperations.ts                    # Feature-specific step definitions
+    └── Common/
+        └── CommonStepDefinitions.ts             # Shared step definitions
+```
+
+### Architecture Principles
+
+#### 🔗 **Inheritance Chain (Zero Code Duplication)**
+
+```typescript
+BasePage                    // e2e/PagesAndComponents/Common/BasePage.ts
+    ↓                       // Core functionality for ALL pages
+BaseBuyPage                 // e2e/PagesAndComponents/BuyPage/BaseBuyPage.ts
+    ↓                       // Abstract buy page contracts
+IdeaBuyPage                 // e2e/PagesAndComponents/BuyPage/IdeaBuyPage.ts
+RustRoverBuyPage            // e2e/PagesAndComponents/BuyPage/RustRoverBuyPage.ts
+CLionBuyPage                // e2e/PagesAndComponents/BuyPage/CLionBuyPage.ts
+```
+
+#### 📋 **Abstract Method Contracts**
+
+Every buy page MUST implement:
+
+```typescript
+abstract validateCommonTierSwitcher(): Promise<void>;
+abstract validateBillingTermSwitcher(): Promise<void>;
+abstract validateDefaultStateOfProductCards(): Promise<void>;
+```
+
+#### 🏭 **Centralized Locator Factory**
+
+- All selectors defined in `SELECTORS` constants
+- Product-specific locator creation methods
+- Single source of truth for locator management
+
+### Legacy Structure (For Reference)
+
+The following structure shows the full project layout:
+
+```
+playwright-bdd-boilerplate/
+├── .features-gen/              # Generated spec files
+├── allure-report/              # Generated reports
+├── allure-results/             # Test results
+├── docs/                       # 📚 Comprehensive documentation
+│   ├── WRITING_NEW_TESTS.md
+│   ├── TESTING_STRATEGY.md
+│   ├── LOCATOR_STRATEGY.md
+│   └── REFACTORING_SUMMARY.md
+├── e2e/                        # Test implementation (see above)
+├── test-results/               # Playwright test results
+└── utils/                      # Helper utilities
+    └── readAriaSnapshot.ts
+```
+
+## 📋 Page Object Guidelines
+
+### ✅ **DO (Current Architecture)**
+
+#### Extend Appropriate Base Classes
+
+```typescript
+// ✅ CORRECT - All buy pages extend BaseBuyPage
+export class IdeaBuyPage extends BaseBuyPage {
+  constructor(page: Page) {
+    super(page);
+    // Implementation...
+  }
+}
+```
+
+#### Use Locator Factory
+
+```typescript
+// ✅ CORRECT - Get locators from factory
+this.locatorFactory = new buyPageLocatorFactory.Locators(page);
+const locators = this.locatorFactory.createIdeaLocators();
+```
+
+#### Implement Abstract Methods
+
+```typescript
+// ✅ CORRECT - All abstract methods implemented
+async validateCommonTierSwitcher(): Promise<void> {
+  // IDEA-specific implementation
+}
+```
+
+### ❌ **DON'T (Anti-patterns)**
+
+#### Don't Skip Inheritance
+
+```typescript
+// ❌ BAD - Skips inheritance chain
+export class ProductPage extends Page {
+  // Missing BasePage functionality
+}
+```
+
+#### Don't Create Locators Directly
+
+```typescript
+// ❌ BAD - Hardcoded selectors scattered
+const card = page.locator('[data-test="some-card"]');
+```
+
+## 📊 Test Reports
+
+### Allure Reporting
+
+The framework uses Allure for comprehensive test reporting with detailed execution information, screenshots, and debugging context.
+
+#### Manual Report Generation
+
+1. **Run tests to generate results:**
+
+```bash
+npm run test:dev
+```
+
+This creates an `allure-results` folder in the project root.
+
+2. **Generate the report:**
+
+```bash
+allure generate allure-results -o allure-report --clean
+```
+
+This creates the `allure-report` folder.
+
+3. **Open the report:**
+
+```bash
+allure open allure-report
+```
+
+## 🏷️ Test Tagging Strategy
+
+### Custom Tags
+
+Tags can be applied at multiple levels:
+
+- **Feature** level
+- **Rule** level
+- **Scenario** level
+- **Scenario Outline** level
+- **Examples** level
+
+Examples: `@smoke`, `@business-critical`, `@functional`, `@accessibility`
+
+### Tag Filtering
+
+Use logical operators for flexible test execution:
+
+```bash
+# Run only smoke tests
+TAGS="@smoke" npm run test:dev
+
+# Run all tests except extras
+TAGS="not @extras" npm run test:dev
+
+# Run smoke OR functional tests
+TAGS="@smoke or @functional" npm run test:dev
+
+# Run business-critical AND not extras
+TAGS="@business-critical and not @extras" npm run test:dev
+```
+
+### Smart Tags
+
+- **`@skip`** - Skip specific tests
+- **`@only`** - Run only tagged tests (useful for debugging)
+
+## 🚀 Getting Started for New Team Members
+
+1. **Read Documentation** - Start with [Writing New Tests](docs/WRITING_NEW_TESTS.md)
+2. **Understand Architecture** - Review [Testing Strategy](docs/TESTING_STRATEGY.md)
+3. **Learn Locator Patterns** - Study [Locator Strategy](docs/LOCATOR_STRATEGY.md)
+4. **Follow Examples** - Look at existing `IdeaBuyPage.ts` as reference implementation
+5. **Maintain Inheritance** - Always extend `BasePage` or `BaseBuyPage` appropriately
+
+## 🔧 Environment & Constraints
+
+### Current Reality
+
+- **Working CSS selectors** prioritized due to no development team access
+- **Stable, proven selectors** maintained for reliability
+- **Clean architecture** implemented despite selector constraints
+- **Centralized locator management** ready for future semantic improvements
+
+### Future Improvements
+
+When development team collaboration becomes available:
+
+- Migrate to semantic locators (`getByRole`, `getByTestId`)
+- Add accessibility testing integration
+- Implement test-id strategy for complex components
+
+---
+
+## 📞 Support
+
+For questions about the framework architecture or writing new tests, refer to the comprehensive documentation in the `docs/` folder or review existing implementations as examples.

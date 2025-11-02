@@ -2,12 +2,12 @@ import { test as base, createBdd } from 'playwright-bdd';
 
 import BasePage from '#e2e/PagesAndComponents/Common/BasePage';
 import CookieConsentDialog from '#e2e/PagesAndComponents/CookieConsentDialog/CookieConsentDialog';
-import BuyPage from '#e2e/PagesAndComponents/BuyPage/BuyPage';
+import { BuyPageFactory } from '#e2e/PagesAndComponents/BuyPage/BuyPageFactory';
 
 type Fixtures = {
   basePage: BasePage;
   cookieConsentDialog: CookieConsentDialog;
-  buyPage: BuyPage;
+  buyPageFactory: BuyPageFactory;
 };
 
 export const test = base.extend<Fixtures>({
@@ -19,9 +19,9 @@ export const test = base.extend<Fixtures>({
     const cookieConsentOverlay = new CookieConsentDialog(page);
     await use(cookieConsentOverlay);
   },
-  buyPage: async ({ page }, use) => {
-    const buyPage = new BuyPage(page);
-    await use(buyPage);
+  buyPageFactory: async ({ page }, use) => {
+    const buyPageFactory = new BuyPageFactory(page);
+    await use(buyPageFactory);
   },
 });
 

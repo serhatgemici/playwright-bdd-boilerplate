@@ -1,7 +1,7 @@
 import { expect, Page, Locator } from '@playwright/test';
 import BasePage from '../Common/BasePage';
 import * as cookieConsentDialogLocatorFactory from './CookieConsentDialogLocatorFactory';
-import { DISPLAYED, NOT_DISPLAYED, HIDDEN } from '../Common/CommonConstants';
+import * as commonConstants from '../Common/CommonConstants';
 
 class CookieConsentOverlay {
   page: Page;
@@ -30,13 +30,13 @@ class CookieConsentOverlay {
   }
 
   async validateCookieConsentDailogState(dialogState: string): Promise<void> {
-    if (dialogState === DISPLAYED) {
+    if (dialogState === commonConstants.DISPLAYED) {
       await this.validateCookieConsentDialogDisplayed();
-    } else if (dialogState === NOT_DISPLAYED) {
+    } else if (dialogState === commonConstants.NOT_DISPLAYED) {
       await this.validateCookieConsentDialogClosed();
     } else {
       throw new Error(
-        `Invalid state: ${dialogState}. Valid states are "${DISPLAYED}" or "${NOT_DISPLAYED}".`
+        `Invalid state: ${dialogState}. Valid states are "${commonConstants.DISPLAYED}" or "${commonConstants.NOT_DISPLAYED}".`
       );
     }
   }
@@ -47,7 +47,7 @@ class CookieConsentOverlay {
 
   async validateCookieConsentDialogClosed(): Promise<void> {
     await this.cookieConsentDialogHeading.waitFor({
-      state: HIDDEN,
+      state: commonConstants.HIDDEN,
     });
   }
 }

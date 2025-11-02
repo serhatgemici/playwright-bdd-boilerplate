@@ -1,5 +1,5 @@
 import { Page, Locator } from '@playwright/test';
-import { COOKIE_CONSENT_DIALOG_TEXTS } from './CookieConsentDialogConstants';
+import * as cookieConsentConstants from './CookieConsentDialogConstants';
 
 export class Locators {
   constructor(private page: Page) {}
@@ -14,13 +14,13 @@ export class Locators {
 
   createCookieConsentDialogHeading(): Locator {
     return this.page.getByRole('heading', {
-      name: COOKIE_CONSENT_DIALOG_TEXTS.HEADING,
+      name: cookieConsentConstants.COOKIE_CONSENT_DIALOG_TEXTS.HEADING,
     });
   }
 
   createAcceptAllButton(): Locator {
     return this.page.getByRole('button', {
-      name: COOKIE_CONSENT_DIALOG_TEXTS.ACCEPT_ALL_BUTTON,
+      name: cookieConsentConstants.COOKIE_CONSENT_DIALOG_TEXTS.ACCEPT_ALL_BUTTON,
     });
   }
 }

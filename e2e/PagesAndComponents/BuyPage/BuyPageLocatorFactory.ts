@@ -1,5 +1,5 @@
 import { Page, Locator } from '@playwright/test';
-import { PRODUCT_CARD_TITLES } from './BuyPageConstants';
+import * as buyPageConstants from './BuyPageConstants';
 
 // Selector Constants
 export const SELECTORS = {
@@ -12,52 +12,84 @@ export const SELECTORS = {
   CLION_COMMERCIAL_CARD: '[data-test="non-commercial-product-buy-card-CLion-Commercial"]',
   STICKY_TAG_WRAPPER: '[data-test="sticky-tag-wrapper"]',
   BUTTON: '[data-test="button"]',
+  RUSTROVER_DOWNLOAD_LINK: 'div:nth-child(4) > a',
 } as const;
 
 export class Locators {
   constructor(private page: Page) {}
 
-  // Create all locators at once
-  createAllLocators() {
-    const cLionNonCommercialProductCard = this.createCLionNonCommercialProductCard();
-    const rustRoverProductCards = this.createRustRoverProductCards();
-    const cLionCommercialProductCard = this.createCLionCommercialProductCard();
-    const cLionAllProductsPackProductCard = this.createCLionAllProductsPackProductCard();
-
+  // Create common locators used across multiple buy pages
+  createCommonLocators() {
     return {
-      commonAdaptiveSwitcherLocator: this.createCommonAdaptiveSwitcherLocator.bind(this),
-      billingTypeRadioGroupLocator: this.createBillingTypeRadioGroup(),
-      ideaProductCardLocator: this.createIdeaProductCard.bind(this),
-      rustRoverProductCardLocators: rustRoverProductCards,
-      cLionNonCommercialProductCardLocator: cLionNonCommercialProductCard,
-      cLionCommercialProductCardLocator: cLionCommercialProductCard,
-      cLionAllProductsPackProductCardLocator: cLionAllProductsPackProductCard,
-      cLionNonCommercialProductCardDownloadButtonLocator:
-        this.createCLionNonCommercialProductCardDownloadButton(cLionNonCommercialProductCard),
-      rustRoverProductCardLocatorMapper: (cardTitle: string) =>
-        this.rustRoverProductCardLocatorMapper(cardTitle, rustRoverProductCards),
-      cLionProductCardLocatorMapper: (cardTitle: string) =>
-        this.cLionProductCardLocatorMapper(
-          cardTitle,
-          cLionNonCommercialProductCard,
-          cLionCommercialProductCard,
-          cLionAllProductsPackProductCard
-        ),
+      tierSwitcher: this.createTierSwitcher(),
+      billingSwitcher: this.createBillingSwitcher(),
+      billingRadioGroup: this.createBillingRadioGroup(),
     };
   }
 
-  createCommonAdaptiveSwitcherLocator(labels: string[]): Locator {
+  // Create IDEA-specific locators
+  createIdeaLocators() {
+    return {
+      ...this.createCommonLocators(),
+      ideaUltimateCard: this.createIdeaProductCard(
+        buyPageConstants.PRODUCT_CARD_TITLES.INTELLIJ_IDEA_ULTIMATE
+      ),
+      allProductsPackCard: this.createIdeaProductCard(
+        buyPageConstants.PRODUCT_CARD_TITLES.ALL_PRODUCTS_PACK
+      ),
+    };
+  }
+
+  // Create RustRover-specific locators
+  createRustRoverLocators() {
+    const rustRoverProductCards = this.createRustRoverProductCards();
+    return {
+      tierSwitcher: this.createTierSwitcher(),
+      billingRadioGroup: this.createBillingRadioGroup(),
+      rustRoverProductCards,
+      nonCommercialCard: rustRoverProductCards.nth(0),
+      commercialCard: rustRoverProductCards.nth(1),
+      allProductsPackCard: rustRoverProductCards.nth(2),
+      rustPluginCard: rustRoverProductCards.nth(3),
+    };
+  }
+
+  // Create CLion-specific locators
+  createCLionLocators() {
+    const nonCommercialCard = this.createCLionNonCommercialCard();
+    const allProductsPackCard = this.createCLionAllProductsPackCard();
+
+    return {
+      billingSwitcher: this.createBillingSwitcher(),
+      nonCommercialCard,
+      commercialCard: this.createCLionCommercialCard(),
+      allProductsPackCard,
+      downloadButton: this.createCLionDownloadButton(nonCommercialCard),
+    };
+  }
+
+  // Common locator creation methods
+  createTierSwitcher(): Locator {
     return this.page
       .locator(SELECTORS.ADAPTIVE_SWITCHER)
-      .filter({ has: this.page.getByRole('button', { name: labels[0] }) })
-      .filter({ has: this.page.getByRole('button', { name: labels[1] }) })
+      .filter({ has: this.page.getByRole('button', { name: buyPageConstants.TIER_LABELS[0] }) })
+      .filter({ has: this.page.getByRole('button', { name: buyPageConstants.TIER_LABELS[1] }) })
       .first();
   }
 
-  createBillingTypeRadioGroup(): Locator {
+  createBillingSwitcher(): Locator {
+    return this.page
+      .locator(SELECTORS.ADAPTIVE_SWITCHER)
+      .filter({ has: this.page.getByRole('button', { name: buyPageConstants.BILLING_LABELS[0] }) })
+      .filter({ has: this.page.getByRole('button', { name: buyPageConstants.BILLING_LABELS[1] }) })
+      .first();
+  }
+
+  createBillingRadioGroup(): Locator {
     return this.page.locator(SELECTORS.BILLING_RADIO_GROUP);
   }
 
+  // IDEA-specific locator creation methods
   createIdeaProductCard(productCardTitle: string): Locator {
     return this.page
       .locator(SELECTORS.PRODUCT_CARD)
@@ -67,67 +99,56 @@ export class Locators {
       .first();
   }
 
+  // RustRover-specific locator creation methods
   createRustRoverProductCards(): Locator {
     return this.page.locator(SELECTORS.RUST_ROVER_CARDS);
   }
 
-  createCLionNonCommercialProductCard(): Locator {
+  // CLion-specific locator creation methods
+  createCLionNonCommercialCard(): Locator {
     return this.page.locator(SELECTORS.CLION_NON_COMMERCIAL_CARD);
   }
 
-  createCLionCommercialProductCard(): Locator {
+  createCLionCommercialCard(): Locator {
     return this.page.locator(SELECTORS.CLION_COMMERCIAL_CARD);
   }
 
-  createCLionAllProductsPackProductCard(): Locator {
+  createCLionAllProductsPackCard(): Locator {
     return this.page
       .locator(SELECTORS.STICKY_TAG_WRAPPER)
       .filter({
-        has: this.page.locator(SELECTORS.PRODUCT_NAME).filter({ hasText: 'All Products Pack' }),
+        has: this.page
+          .locator(SELECTORS.PRODUCT_NAME)
+          .filter({ hasText: buyPageConstants.PRODUCT_CARD_TITLES.ALL_PRODUCTS_PACK }),
       })
       .first();
   }
 
-  createCLionNonCommercialProductCardDownloadButton(
-    cLionNonCommercialProductCard: Locator
-  ): Locator {
-    return cLionNonCommercialProductCard.locator(SELECTORS.BUTTON);
+  createCLionDownloadButton(nonCommercialCard: Locator): Locator {
+    return nonCommercialCard.locator(SELECTORS.BUTTON);
   }
 
-  rustRoverProductCardLocatorMapper(cardTitle: string, rustRoverProductCards: Locator): Locator {
-    switch (cardTitle) {
-      case PRODUCT_CARD_TITLES.RUSTROVER_NON_COMMERCIAL:
-        return rustRoverProductCards.nth(0);
-      case PRODUCT_CARD_TITLES.RUSTROVER_COMMERCIAL:
-        return rustRoverProductCards.nth(1);
-      case PRODUCT_CARD_TITLES.ALL_PRODUCTS_PACK:
-        return rustRoverProductCards.nth(2);
-      case PRODUCT_CARD_TITLES.RUST_PLUGIN:
-        return rustRoverProductCards.nth(3);
-      default:
-        throw new Error(
-          `Invalid card title: ${cardTitle}. Valid card titles are ${PRODUCT_CARD_TITLES.RUSTROVER_NON_COMMERCIAL}, ${PRODUCT_CARD_TITLES.RUSTROVER_COMMERCIAL}, ${PRODUCT_CARD_TITLES.ALL_PRODUCTS_PACK}, or ${PRODUCT_CARD_TITLES.RUST_PLUGIN}.`
-        );
-    }
+  // Utility method for getting tier switcher selector (used for validation)
+  getAdaptiveSwitcherSelector(): string {
+    return SELECTORS.ADAPTIVE_SWITCHER;
   }
 
-  cLionProductCardLocatorMapper(
-    cardTitle: string,
-    cLionNonCommercialProductCard: Locator,
-    cLionCommercialProductCard: Locator,
-    cLionAllProductsPackProductCard: Locator
-  ): Locator {
-    switch (cardTitle) {
-      case PRODUCT_CARD_TITLES.CLION_NON_COMMERCIAL:
-        return cLionNonCommercialProductCard;
-      case PRODUCT_CARD_TITLES.CLION_COMMERCIAL:
-        return cLionCommercialProductCard;
-      case PRODUCT_CARD_TITLES.ALL_PRODUCTS_PACK:
-        return cLionAllProductsPackProductCard;
-      default:
-        throw new Error(
-          `Invalid card title: ${cardTitle}. Valid card titles are ${PRODUCT_CARD_TITLES.CLION_NON_COMMERCIAL}, ${PRODUCT_CARD_TITLES.CLION_COMMERCIAL}, or ${PRODUCT_CARD_TITLES.ALL_PRODUCTS_PACK}.`
-        );
-    }
+  // Utility method for creating AI Pro checkbox locator within any card
+  createAiProCheckbox(cardLocator: Locator): Locator {
+    return cardLocator.getByRole('checkbox', {
+      name: buyPageConstants.UI_TEXT.AI_PRO_CHECKBOX,
+    });
+  }
+
+  // Utility method for creating full suite link locator within any card
+  createFullSuiteLink(cardLocator: Locator): Locator {
+    return cardLocator.getByRole('link', {
+      name: buyPageConstants.UI_TEXT.FULL_SUITE_LINK,
+    });
+  }
+
+  // Utility method for creating RustRover download link within any card
+  createRustRoverDownloadLink(cardLocator: Locator): Locator {
+    return cardLocator.locator(SELECTORS.RUSTROVER_DOWNLOAD_LINK);
   }
 }

@@ -1,21 +1,26 @@
 import { defineConfig, devices, PlaywrightTestConfig, ReporterDescription } from '@playwright/test';
 import { defineBddConfig } from 'playwright-bdd';
-import * as os from "os";
+import * as os from 'os';
 
 const testDir = defineBddConfig({
-    features: ['e2e/Features/*.feature'],
-    steps: ['e2e/StepDefinitions/*.ts','e2e/StepDefinitions/Common/*.ts', 'e2e/Fixtures/FixturesBDD.ts'],
-    aiFix: {
+  features: ['e2e/Features/*.feature'],
+  steps: [
+    'e2e/StepDefinitions/*.ts',
+    'e2e/StepDefinitions/Common/*.ts',
+    'e2e/Fixtures/FixturesBDD.ts',
+  ],
+  aiFix: {
     promptAttachment: true,
   },
 });
 
 // List of reporters
 const reporters: ReporterDescription[] = [
-  ["allure-playwright", 
+  [
+    'allure-playwright',
     {
       detail: false,
-      outputFolder: "pw-allure-report",
+      outputFolder: 'pw-allure-report',
       suiteTitle: true,
       environmentInfo: {
         os_platform: os.platform(),
@@ -30,7 +35,7 @@ const reporters: ReporterDescription[] = [
 const config: PlaywrightTestConfig = defineConfig({
   testDir,
   reporter: reporters,
-  retries: process.env.CI ? 1 : 1,
+  retries: process.env.CI ? 2 : 1,
   timeout: 120000, // overal timeout for each test
   expect: {
     timeout: 13000, //timeout for expect assertions
@@ -40,28 +45,32 @@ const config: PlaywrightTestConfig = defineConfig({
   projects: [
     {
       name: 'Develop',
-      use: { 
-        ...devices['Desktop Chrome'], 
-        baseURL: 'https://www.jetbrains.com', },
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'https://www.jetbrains.com',
+      },
     },
     {
       name: 'Stage',
-      use: { 
-        ...devices['Desktop Chrome'], 
-        baseURL: 'https://www.jetbrains.com', },
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'https://www.jetbrains.com',
+      },
     },
     {
       name: 'Local',
-      use: { 
-        ...devices['Desktop Chrome'], 
-        baseURL: 'https://www.jetbrains.com', },
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'https://www.jetbrains.com',
+      },
     },
     {
       name: 'Production',
-      use: { 
-        ...devices['Desktop Chrome'], 
-        baseURL: 'https://www.jetbrains.com', },
-    }
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'https://www.jetbrains.com',
+      },
+    },
   ],
 
   use: {
@@ -71,8 +80,8 @@ const config: PlaywrightTestConfig = defineConfig({
     screenshot: 'only-on-failure', // save screenshots on failure
     locale: 'de-DE',
     timezoneId: 'Europe/Berlin',
-    video: 'retain-on-failure' // record video for each test, but only keep it if the test fails
-  }, 
+    video: 'retain-on-failure', // record video for each test, but only keep it if the test fails
+  },
 });
 
 export default config;
