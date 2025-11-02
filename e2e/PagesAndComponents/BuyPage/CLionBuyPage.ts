@@ -64,15 +64,15 @@ export class CLionBuyPage extends BaseBuyPage {
   }
 
   // Implementation of abstract methods from BaseBuyPage
-  async validateCommonTierSwitcher(_productName: string): Promise<void> {
+  async validateCommonTierSwitcher(): Promise<void> {
     await this.validateCLionTierSwitcher();
   }
 
-  async validateBillingTermSwitcher(_productName: string): Promise<void> {
+  async validateBillingTermSwitcher(): Promise<void> {
     await this.validateCLionBillingTermSwitcher();
   }
 
-  async validateDefaultStateOfProductCards(_productName: string): Promise<void> {
+  async validateDefaultStateOfProductCards(): Promise<void> {
     await this.validateCLionDefaultProductCards();
   }
 

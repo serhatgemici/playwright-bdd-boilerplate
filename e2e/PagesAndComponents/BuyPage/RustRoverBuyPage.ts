@@ -62,15 +62,15 @@ export class RustRoverBuyPage extends BaseBuyPage {
   }
 
   // Implementation of abstract methods from BaseBuyPage
-  async validateCommonTierSwitcher(_productName: string): Promise<void> {
+  async validateCommonTierSwitcher(): Promise<void> {
     await this.validateRustRoverTierSwitcher();
   }
 
-  async validateBillingTermSwitcher(_productName: string): Promise<void> {
+  async validateBillingTermSwitcher(): Promise<void> {
     await this.validateRustRoverBillingTermSwitcher();
   }
 
-  async validateDefaultStateOfProductCards(_productName: string): Promise<void> {
+  async validateDefaultStateOfProductCards(): Promise<void> {
     await this.validateRustRoverDefaultProductCards();
   }
 

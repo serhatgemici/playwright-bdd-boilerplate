@@ -55,15 +55,15 @@ export class IdeaBuyPage extends BaseBuyPage {
   }
 
   // Implementation of abstract methods from BaseBuyPage
-  async validateCommonTierSwitcher(_productName: string): Promise<void> {
+  async validateCommonTierSwitcher(): Promise<void> {
     await this.validateIdeaTierSwitcher();
   }
 
-  async validateBillingTermSwitcher(_productName: string): Promise<void> {
+  async validateBillingTermSwitcher(): Promise<void> {
     await this.validateIdeaBillingTermSwitcher();
   }
 
-  async validateDefaultStateOfProductCards(_productName: string): Promise<void> {
+  async validateDefaultStateOfProductCards(): Promise<void> {
     await this.validateIdeaDefaultProductCards();
   }
 

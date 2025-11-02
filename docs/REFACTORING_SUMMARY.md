@@ -131,7 +131,7 @@ export abstract class BaseBuyPage extends BasePage {
 
 // Product pages implement all abstract methods
 export class IdeaBuyPage extends BaseBuyPage {
-  async validateCommonTierSwitcher(_productName: string): Promise<void> {
+  async validateCommonTierSwitcher(): Promise<void> {
     await this.validateIdeaTierSwitcher();
   }
   // ... other implementations
