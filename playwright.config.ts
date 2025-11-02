@@ -1,18 +1,5 @@
 import { defineConfig, devices, PlaywrightTestConfig, ReporterDescription } from '@playwright/test';
-import { defineBddConfig } from 'playwright-bdd';
 import * as os from 'os';
-
-const testDir = defineBddConfig({
-  features: ['e2e/Features/*.feature'],
-  steps: [
-    'e2e/StepDefinitions/*.ts',
-    'e2e/StepDefinitions/Common/*.ts',
-    'e2e/Fixtures/FixturesBDD.ts',
-  ],
-  aiFix: {
-    promptAttachment: true,
-  },
-});
 
 // List of reporters
 const reporters: ReporterDescription[] = [
@@ -33,7 +20,7 @@ const reporters: ReporterDescription[] = [
 ];
 
 const config: PlaywrightTestConfig = defineConfig({
-  testDir,
+  testDir: './e2e/Features',
   reporter: reporters,
   retries: process.env.CI ? 2 : 1,
   timeout: 120000, // overal timeout for each test
