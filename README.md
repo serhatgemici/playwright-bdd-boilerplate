@@ -1,13 +1,22 @@
 # Playwright BDD Test Automation Framework
 
-> A clean, scalable test automation framework using [playwright-bdd](https://vitalets.github.io/playwright-bdd/#/) with inheritance-based architecture and centralized locator management.
+> A revolutionary test automation framework combining **BDD readability** with **Playwright performance** through innovative Common Fixtures Architecture. Features inheritance-based page objects, centralized locator management, and BDD-style step definitions without Cucumber overhead.
 
 ## 🏗️ Architecture Overview
 
-This framework implements a **clean inheritance hierarchy** with **abstract method contracts** and **centralized locator management** to eliminate code duplication and ensure consistent behavior across all test implementations.
+This framework implements a **revolutionary two-layer Common Fixtures system** that delivers BDD-style test readability with full Playwright performance, type safety, and developer experience.
+
+### 🆕 Common Fixtures Architecture (Revolutionary BDD-Style Approach)
+
+- **Two-Layer Fixture System**: `CommonFixtures` (base) + Domain Extensions (e.g., `ProductPurchaseJourneyFixtures`)
+- **BDD-Style Step Definitions**: `givenUserIsOnPage()`, `whenUserAcceptsCookies()`, `thenTierSwitcherIsValidated()`
+- **Automatic Inheritance**: Domain fixtures inherit ALL common steps automatically
+- **Full Type Safety**: Complete autocompletion and compile-time validation
+- **Zero Cucumber Overhead**: Pure Playwright performance with BDD readability
 
 ### Key Architectural Patterns
 
+- **Common Fixtures Pattern**: Two-layer system with base + domain-specific extensions
 - **Inheritance Chain**: `BasePage` → `BaseBuyPage` → Product-specific pages
 - **Abstract Method Contracts**: Enforced implementation of validation methods
 - **Locator Factory Pattern**: Centralized management via `BuyPageLocatorFactory`
@@ -17,10 +26,10 @@ This framework implements a **clean inheritance hierarchy** with **abstract meth
 
 Comprehensive guides are available in the `docs/` folder:
 
-- **[Writing New Tests](docs/WRITING_NEW_TESTS.md)** - Complete guide for creating new tests with inheritance patterns
-- **[Testing Strategy](docs/TESTING_STRATEGY.md)** - Architecture principles and team guidelines
-- **[Locator Strategy](docs/LOCATOR_STRATEGY.md)** - Centralized locator management and best practices
-- **[Refactoring Summary](docs/REFACTORING_SUMMARY.md)** - Evolution of the codebase architecture
+- **[Writing New Tests](docs/WRITING_NEW_TESTS.md)** - Complete guide for Common Fixtures Architecture and inheritance patterns
+- **[Testing Strategy](docs/TESTING_STRATEGY.md)** - Common Fixtures strategy, architecture principles, and team guidelines
+- **[Locator Strategy](docs/LOCATOR_STRATEGY.md)** - Centralized locator management integrated with Common Fixtures
+- **[Refactoring Summary](docs/REFACTORING_SUMMARY.md)** - Evolution to Common Fixtures Architecture and achievements
 
 ## Prerequisites
 
@@ -91,16 +100,19 @@ npm run open:dev:watch     # Interactive with file watching
 
 ## 🏗️ Project Architecture
 
-### Inheritance-Based Structure
+### Common Fixtures + Inheritance-Based Structure
 
 ```
 e2e/
 ├── Data/
 │   └── aria/                                    # ARIA snapshot files for validation
 ├── Features/
-│   └── @BuyPageOperations.feature               # BDD feature files
-├── Fixtures/
-│   └── FixturesBDD.ts                           # Test fixtures
+│   ├── @BuyPageOperations.feature               # 🔄 Traditional BDD feature files (backward compatibility)
+│   └── ProductPurchaseJourneyTests.spec.ts     # 🆕 Common Fixtures tests (.spec.ts files)
+├── Fixtures/                                    # 🆕 REVOLUTIONARY: BDD-style step definition fixtures
+│   ├── CommonFixtures.ts                       # 🆕 Base layer - common step definitions for ALL domains
+│   ├── ProductPurchaseJourneyFixtures.ts       # 🆕 Extension layer - domain-specific fixtures
+│   └── FixturesBDD.ts                           # 🔄 Legacy BDD fixtures (maintained for compatibility)
 ├── PagesAndComponents/                          # Clean inheritance hierarchy
 │   ├── Common/
 │   │   ├── BasePage.ts                          # Core page functionality (ALL pages extend this)
@@ -115,15 +127,33 @@ e2e/
 │   │   └── BuyPageLocatorFactory.ts             # Centralized locator management
 │   └── CookieConsentDialog/
 │       └── CookieConsentDialog.ts               # Cookie dialog handling
-└── StepDefinitions/
-    ├── @BuyPageOperations.ts                    # Feature-specific step definitions
+└── StepDefinitions/                             # 🔄 LEGACY: Traditional BDD step definitions
+    ├── @BuyPageOperations.ts                    # (Use Fixtures/ for new tests)
     └── Common/
-        └── CommonStepDefinitions.ts             # Shared step definitions
+        └── CommonStepDefinitions.ts             # (Use CommonFixtures.ts for new common steps)
 ```
 
 ### Architecture Principles
 
-#### 🔗 **Inheritance Chain (Zero Code Duplication)**
+#### 🆕 **Two-Layer Common Fixtures System**
+
+```typescript
+// Layer 1: Base common step definitions for ALL domains
+CommonFixtures.ts
+├── givenUserIsOnPage(pageSlug: string)
+├── whenUserAcceptsCookies()
+├── thenThereAreNoErrorsInConsole()
+└── All shared BDD-style step definitions
+    ↓
+// Layer 2: Domain-specific extensions (inherits ALL common automatically)
+ProductPurchaseJourneyFixtures.ts extends CommonFixtures
+├── ✅ ALL CommonFixtures inherited automatically
+├── thenTierSwitcherIsValidated(productName: string)
+├── thenBillingTermSwitcherIsValidated(productName: string)
+└── Domain-specific BDD-style step definitions
+```
+
+#### 🔗 **Page Object Inheritance Chain (Zero Code Duplication)**
 
 ```typescript
 BasePage                    // e2e/PagesAndComponents/Common/BasePage.ts
@@ -150,6 +180,7 @@ abstract validateDefaultStateOfProductCards(): Promise<void>;
 - All selectors defined in `SELECTORS` constants
 - Product-specific locator creation methods
 - Single source of truth for locator management
+- Integrated with Common Fixtures for seamless usage
 
 ### Legacy Structure (For Reference)
 
@@ -171,11 +202,48 @@ playwright-bdd-boilerplate/
     └── readAriaSnapshot.ts
 ```
 
-## 📋 Page Object Guidelines
+## 🆕 Common Fixtures Usage Guide
 
-### ✅ **DO (Current Architecture)**
+### ✅ **DO (Common Fixtures Architecture)**
 
-#### Extend Appropriate Base Classes
+#### Writing Tests with Common Fixtures
+
+```typescript
+// ✅ CORRECT - Use domain-specific fixtures (get common + domain automatically)
+import { test } from '../Fixtures/ProductPurchaseJourneyFixtures';
+
+test('buy page validation', async ({
+  // Common step definitions (inherited automatically from CommonFixtures)
+  givenUserIsOnPage,
+  whenUserAcceptsCookies,
+  thenThereAreNoErrorsInConsole,
+
+  // Domain-specific step definitions (from ProductPurchaseJourneyFixtures)
+  thenTierSwitcherIsValidated,
+  thenBillingTermSwitcherIsValidated,
+}) => {
+  // BDD-style test execution with full type safety
+  await givenUserIsOnPage('buy/idea');
+  await whenUserAcceptsCookies();
+  await thenTierSwitcherIsValidated('idea');
+  await thenThereAreNoErrorsInConsole();
+});
+```
+
+#### Creating New Domain Fixtures
+
+```typescript
+// ✅ CORRECT - Extend CommonFixtures for new domains
+import { test as baseTest, type CommonFixtures } from './CommonFixtures';
+
+export type NewDomainFixtures = CommonFixtures & {
+  // Domain-specific fixtures
+  thenNewDomainValidationPasses: () => Promise<void>;
+  // ALL CommonFixtures inherited automatically ✅
+};
+```
+
+#### Using Page Object Inheritance
 
 ```typescript
 // ✅ CORRECT - All buy pages extend BaseBuyPage
@@ -187,39 +255,34 @@ export class IdeaBuyPage extends BaseBuyPage {
 }
 ```
 
-#### Use Locator Factory
-
-```typescript
-// ✅ CORRECT - Get locators from factory
-this.locatorFactory = new buyPageLocatorFactory.Locators(page);
-const locators = this.locatorFactory.createIdeaLocators();
-```
-
-#### Implement Abstract Methods
-
-```typescript
-// ✅ CORRECT - All abstract methods implemented
-async validateCommonTierSwitcher(): Promise<void> {
-  // IDEA-specific implementation
-}
-```
-
 ### ❌ **DON'T (Anti-patterns)**
 
-#### Don't Skip Inheritance
+#### Don't Use Legacy BDD for New Tests
+
+```typescript
+// ❌ BAD - Traditional BDD approach (use for existing tests only)
+Given('user is on the {string} page', async ({ basePage }, pageSlug) => {
+  // Use CommonFixtures instead: givenUserIsOnPage(pageSlug)
+});
+```
+
+#### Don't Skip Common Fixtures Inheritance
+
+```typescript
+// ❌ BAD - Missing inheritance from CommonFixtures
+export type DomainFixtures = {
+  // Missing CommonFixtures inheritance
+  // Have to redefine common steps manually
+};
+```
+
+#### Don't Skip Page Object Inheritance
 
 ```typescript
 // ❌ BAD - Skips inheritance chain
 export class ProductPage extends Page {
   // Missing BasePage functionality
 }
-```
-
-#### Don't Create Locators Directly
-
-```typescript
-// ❌ BAD - Hardcoded selectors scattered
-const card = page.locator('[data-test="some-card"]');
 ```
 
 ## 📊 Test Reports
@@ -291,11 +354,29 @@ TAGS="@business-critical and not @extras" npm run test:dev
 
 ## 🚀 Getting Started for New Team Members
 
-1. **Read Documentation** - Start with [Writing New Tests](docs/WRITING_NEW_TESTS.md)
-2. **Understand Architecture** - Review [Testing Strategy](docs/TESTING_STRATEGY.md)
-3. **Learn Locator Patterns** - Study [Locator Strategy](docs/LOCATOR_STRATEGY.md)
-4. **Follow Examples** - Look at existing `IdeaBuyPage.ts` as reference implementation
-5. **Maintain Inheritance** - Always extend `BasePage` or `BaseBuyPage` appropriately
+### Quick Start with Common Fixtures
+
+1. **📚 Read Documentation** - Start with [Writing New Tests](docs/WRITING_NEW_TESTS.md) for Common Fixtures guide
+2. **🏗️ Understand Architecture** - Review [Testing Strategy](docs/TESTING_STRATEGY.md) for two-layer fixture system
+3. **🎯 Study Examples** - Examine `ProductPurchaseJourneyTests.spec.ts` for real-world fixture usage
+4. **📍 Learn Locator Patterns** - Study [Locator Strategy](docs/LOCATOR_STRATEGY.md) for centralized management
+5. **🔄 Follow Patterns** - Use `CommonFixtures.ts` and `ProductPurchaseJourneyFixtures.ts` as templates
+
+### Learning Path
+
+1. **CommonFixtures.ts** - Understand base layer with common step definitions
+2. **ProductPurchaseJourneyFixtures.ts** - See how to extend CommonFixtures
+3. **ProductPurchaseJourneyTests.spec.ts** - Study fixture destructuring and usage patterns
+4. **IdeaBuyPage.ts** - Reference implementation for page object inheritance
+5. **BaseBuyPage.ts** - Abstract contracts and inheritance patterns
+
+### Key Concepts to Master
+
+- ✅ **Two-Layer Fixture System**: CommonFixtures (base) + Domain Extensions
+- ✅ **Automatic Inheritance**: Domain fixtures get ALL common steps automatically
+- ✅ **BDD-Style Syntax**: `givenUserIsOnPage()`, `whenUserAcceptsCookies()`, `thenTierSwitcherIsValidated()`
+- ✅ **Type Safety**: Full autocompletion and compile-time validation
+- ✅ **Page Object Inheritance**: Always extend `BasePage` or `BaseBuyPage` appropriately
 
 ## 🔧 Environment & Constraints
 
