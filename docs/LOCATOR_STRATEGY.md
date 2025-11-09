@@ -1,8 +1,8 @@
 # Locator Strategy Guide
 
-## Current Architecture: Centralized Locator Management
+## Current Architecture: Centralized Locator Management + Common Fixtures Integration
 
-**STATUS**: This project implements a **Locator Factory Pattern** with centralized selector management while using working CSS selectors due to environment constraints (no dev team access for test-ids or semantic improvements).
+**STATUS**: This project implements a **Locator Factory Pattern** with centralized selector management integrated with a **Common Fixtures Architecture**, using working CSS selectors due to environment constraints (no dev team access for test-ids or semantic improvements).
 
 ## Guiding Principles
 
@@ -16,7 +16,11 @@ In environments without dev team access, we prioritize working selectors that do
 
 ### 3. **Clean Architecture Despite Constraints**
 
-Even with CSS selectors, we maintain excellent code organization through factory patterns and constants management.
+Even with CSS selectors, we maintain excellent code organization through factory patterns, constants management, and Common Fixtures integration.
+
+### 4. **Common Fixtures Integration**
+
+Locators are used within BDD-style step definition fixtures that provide reusable, parameterized test steps with full type safety.
 
 ## Current Implementation: Locator Factory Pattern
 
@@ -359,9 +363,9 @@ createIdeaLocators() {
 }
 ```
 
-## Integration with Constants
+## Integration with Constants & Common Fixtures
 
-### Locator Factory + Constants Pattern
+### **Locator Factory + Constants + Fixtures Pattern**
 
 ```typescript
 // BuyPageLocatorFactory.ts - Locator creation
@@ -376,17 +380,35 @@ export const UI_TEXT = {
   AI_PRO_LABEL: 'Supercharge with JetBrains AI Pro',
 } as const;
 
-// Usage in page objects
+// Page object usage
 const checkbox = this.locatorFactory.createAiProCheckbox(this.ideaCard);
 await expect(checkbox).toHaveText(buyPageConstants.UI_TEXT.AI_PRO_LABEL);
+
+// Common Fixtures integration - BDD-style step definitions
+// CommonFixtures.ts
+async function givenUserIsOnPage(basePage: BasePage, pageSlug: string) {
+  await test.step(`**GIVEN** user is on the "${pageSlug}" page`, async () => {
+    await basePage.navigateTo(pageSlug); // Uses locator factory internally
+  });
+}
+
+// Usage in tests - BDD-style with locator factory underneath
+test('product validation', async ({
+  givenUserIsOnPage, // Common fixture using locator factory
+  thenTierSwitcherIsValidated, // Domain fixture using locator factory
+}) => {
+  await givenUserIsOnPage('buy/idea');
+  await thenTierSwitcherIsValidated('idea');
+});
 ```
 
 ## Team Communication About Architecture
 
 ### With Stakeholders
 
-- **Explain benefits**: "Centralized locator management ensures easy maintenance"
-- **Show quality**: "Single source of truth prevents duplication and errors"
+- **Explain benefits**: "Centralized locator management with Common Fixtures ensures easy maintenance and BDD readability"
+- **Show quality**: "Single source of truth prevents duplication, and fixtures provide reusable step definitions"
+- **Highlight innovation**: "BDD-style step definitions with Playwright performance and full type safety"
 - **Plan improvements**: "Ready to upgrade to semantic locators when dev access available"
 
 ### Documentation Standards
@@ -395,11 +417,22 @@ await expect(checkbox).toHaveText(buyPageConstants.UI_TEXT.AI_PRO_LABEL);
 // Always document factory method purposes
 /**
  * Creates locators specific to RustRover buy page
+ * Used by RustRover fixtures and page objects
  * Uses nth-child pattern due to DOM structure limitations
  * @returns Object with all RustRover-specific locators
  */
 createRustRoverLocators() {
   // Implementation with comments explaining patterns
+}
+
+// Document fixture integration
+/**
+ * Common step definition that uses locator factory internally
+ * Available to all domain fixtures through inheritance
+ * @param pageSlug - The page path to navigate to
+ */
+async function givenUserIsOnPage(basePage: BasePage, pageSlug: string) {
+  // Implementation using locator factory patterns
 }
 ```
 
