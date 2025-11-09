@@ -1,8 +1,20 @@
 # Writing New Tests - Developer Guide
 
-This guide explains how to add new tests, pages, and components to the Playwright BDD boilerplate project. Follow these patterns to maintain consistency and code quality.
+This guide explains how to add new tests, pages, and components to the Playwright BDD boilerplate project using the **Common Fixtures Architecture**. Follow these patterns to maintain consistency and code quality.
 
 > **🚨 CRITICAL: All page objects MUST extend BasePage (or domain-specific base classes that extend BasePage) to inherit common functionality and avoid code duplication. Never create standalone page classes without proper inheritance.**
+
+## 🏗️ **NEW: Common Fixtures Architecture**
+
+This project now uses a **Common Fixtures Architecture** that provides BDD-style step definitions as reusable Playwright fixtures. This replaces traditional Cucumber step definitions while maintaining the same readable, parameterized syntax.
+
+### **Key Benefits**
+
+- ✅ **BDD-like Syntax**: `givenUserIsOnPage(pageSlug)` reads like Cucumber steps
+- ✅ **Better Performance**: Plain Playwright fixtures (no Cucumber overhead)
+- ✅ **Type Safety**: Full TypeScript support with autocompletion
+- ✅ **Reusability**: Common steps shared across all test domains
+- ✅ **Extensibility**: Easy to create domain-specific fixture extensions
 
 ## 📁 Project Structure Overview
 
@@ -10,9 +22,11 @@ This guide explains how to add new tests, pages, and components to the Playwrigh
 e2e/
 ├── Data/                           # Test data and aria snapshots
 │   └── aria/                       # Aria snapshot files (.aria.yml)
-├── Features/                       # Gherkin feature files (.feature)
-├── Fixtures/                       # Playwright fixtures for dependency injection
-│   └── FixturesBDD.ts              # Main fixture definitions
+├── Features/                       # Test files (.spec.ts) using fixture architecture
+│   └── ProductPurchaseJourneyTests.spec.ts  # Example domain-specific tests
+├── Fixtures/                       # BDD-style step definition fixtures
+│   ├── CommonFixtures.ts           # 🆕 Common step definitions (base layer)
+│   └── ProductPurchaseJourneyFixtures.ts    # 🆕 Domain-specific extensions
 ├── PagesAndComponents/             # Page Object Model implementation
 │   ├── Common/                     # Shared components and utilities
 │   │   ├── BasePage.ts             # Base class for all pages
@@ -27,8 +41,8 @@ e2e/
 │   │   └── CLionBuyPage.ts         # Product-specific implementation
 │   └── CookieConsentDialog/        # Cookie consent component folder
 │       └── CookieConsentDialog.ts  # Component implementation
-└── StepDefinitions/                # Step definition files
-    ├── Common/                     # Shared step definitions
+└── StepDefinitions/                # ⚠️ DEPRECATED: Traditional BDD step definitions
+    ├── Common/                     # (Use Fixtures/ instead for new tests)
     │   └── CommonStepDefinitions.ts
     └── @BuyPageOperations.ts       # Domain-specific steps
 ```
@@ -334,56 +348,195 @@ export class YourNewPageFactory {
 }
 ```
 
-## 🔧 Adding New Fixtures
+## 🆕 **Common Fixtures Architecture**
 
-When you create new page objects, add them to the fixtures for dependency injection:
+### **Understanding the Two-Layer System**
 
-### Update `FixturesBDD.ts`
+The project uses a **two-layer fixture system** for maximum reusability:
+
+#### **Layer 1: CommonFixtures.ts (Base Layer)**
+
+Contains step definitions that are used across ALL test domains:
 
 ```typescript
-import { test as base, createBdd } from 'playwright-bdd';
-import BasePage from '#e2e/PagesAndComponents/Common/BasePage';
+// Available common step definitions
+givenUserIsOnPage(pageSlug: string)                    // Navigation
+thenCookieConsentDialogIs(dialogState: string)         // Cookie consent validation
+whenUserAcceptsCookies()                               // Cookie acceptance
+thenThereAreNoErrorsInConsole()                        // Console error checking
+andHeadingDisplays(expectedTitle: string)              // Page heading validation
+```
+
+#### **Layer 2: Domain-Specific Fixtures (Extension Layer)**
+
+Extends CommonFixtures and adds domain-specific step definitions:
+
+```typescript
+// Example: ProductPurchaseJourneyFixtures.ts extends CommonFixtures
+export type ProductPurchaseJourneyFixtures = CommonFixtures & {
+  // Domain-specific fixtures
+  buyPageFactory: BuyPageFactory;
+  thenTierSwitcherIsValidated: (productName: string) => Promise<void>;
+  thenBillingTermSwitcherIsValidated: (productName: string) => Promise<void>;
+  // ... inherits ALL CommonFixtures automatically
+};
+```
+
+### **Creating New Domain-Specific Fixtures**
+
+When adding a new test domain (e.g., Account Management, Settings), create a new fixture file:
+
+#### **1. Create `YourNewDomainFixtures.ts`**
+
+```typescript
+import { test as baseTest, type CommonFixtures } from './CommonFixtures';
 import { YourNewPageFactory } from '#e2e/PagesAndComponents/YourNewPage/YourNewPageFactory';
 
-type Fixtures = {
-  basePage: BasePage;
-  yourNewPageFactory: YourNewPageFactory; // Add your new fixture
+/**
+ * Your New Domain specific BDD-style step definitions
+ * These extend the common fixtures and add domain-specific validations
+ */
+
+// Domain-Specific Step Definition
+async function thenYourDomainFeatureIsValidated(
+  yourPageFactory: YourNewPageFactory,
+  variant: string
+) {
+  await baseTest.step(
+    `**THEN** your domain feature is validated on "${variant}" page`,
+    async () => {
+      const page = yourPageFactory.createPage(variant);
+      await page.validateDomainFeature();
+    }
+  );
+}
+
+// Extend CommonFixtures with your domain-specific fixtures
+export type YourNewDomainFixtures = CommonFixtures & {
+  // Domain-specific page objects
+  yourNewPageFactory: YourNewPageFactory;
+
+  // Domain-specific step definition fixtures
+  thenYourDomainFeatureIsValidated: (variant: string) => Promise<void>;
 };
 
-export const test = base.extend<Fixtures>({
-  basePage: async ({ page }, use) => {
-    const basePage = new BasePage(page);
-    await use(basePage);
-  },
+export const test = baseTest.extend<YourNewDomainFixtures>({
+  // DOMAIN-SPECIFIC PAGE FIXTURES
   yourNewPageFactory: async ({ page }, use) => {
     const yourNewPageFactory = new YourNewPageFactory(page);
     await use(yourNewPageFactory);
   },
+
+  // DOMAIN-SPECIFIC STEP DEFINITION FIXTURES
+  thenYourDomainFeatureIsValidated: async ({ yourNewPageFactory }, use) => {
+    await use(async (variant: string) => {
+      await thenYourDomainFeatureIsValidated(yourNewPageFactory, variant);
+    });
+  },
 });
+
+export const expect = baseTest.expect;
 ```
 
-## 📝 Writing Step Definitions
-
-Create step definitions in `StepDefinitions/YourNewPageOperations.ts`:
+#### **2. Write Tests Using Your Domain Fixtures**
 
 ```typescript
-import { Given, When, Then } from '#e2e/Fixtures/FixturesBDD.ts';
+import { test } from '../Fixtures/YourNewDomainFixtures';
 
-// Use factory pattern for variant-specific operations
-Then(
-  'main component is validated on {string} page variant',
-  async ({ yourNewPageFactory }, variant: string) => {
-    const page = yourNewPageFactory.createPage(variant);
-    await page.validateMainComponent();
-  }
-);
+test.describe('Your New Domain Tests', () => {
+  test('should validate complete flow', async ({
+    // ✅ Common step definitions (inherited automatically)
+    givenUserIsOnPage,
+    thenCookieConsentDialogIs,
+    whenUserAcceptsCookies,
+    andHeadingDisplays,
+    thenThereAreNoErrorsInConsole,
 
-// Direct fixture usage for simple operations
-When('user performs primary action', async ({ yourNewPageFactory }, variant: string) => {
-  const page = yourNewPageFactory.createPage(variant);
-  await page.performPrimaryAction();
+    // ✅ Domain-specific step definitions
+    thenYourDomainFeatureIsValidated,
+  }) => {
+    // Use common steps for setup
+    await givenUserIsOnPage('your/page');
+    await thenCookieConsentDialogIs('displayed');
+    await whenUserAcceptsCookies();
+    await andHeadingDisplays('Your Page Title');
+
+    // Use domain-specific steps for validation
+    await thenYourDomainFeatureIsValidated('variantA');
+
+    // Use common cleanup
+    await thenThereAreNoErrorsInConsole();
+  });
 });
 ```
+
+### **Available Fixtures by Layer**
+
+#### **CommonFixtures (Base Layer) - Available to ALL domains:**
+
+| **Fixture Method**                 | **BDD Step Equivalent**                          | **Usage**          |
+| ---------------------------------- | ------------------------------------------------ | ------------------ |
+| `givenUserIsOnPage(pageSlug)`      | `Given('user is on the {string} page', ...)`     | Navigation         |
+| `thenCookieConsentDialogIs(state)` | `When('cookie consent dialog is {string}', ...)` | Cookie validation  |
+| `whenUserAcceptsCookies()`         | `When('user accepts all cookies', ...)`          | Cookie acceptance  |
+| `thenThereAreNoErrorsInConsole()`  | `Then('there are no errors in console', ...)`    | Console checking   |
+| `andHeadingDisplays(title)`        | Custom common validation                         | Heading validation |
+
+#### **ProductPurchaseJourneyFixtures (Extension Layer) - Inherits ALL common + adds:**
+
+| **Fixture Method**                            | **Usage**                   |
+| --------------------------------------------- | --------------------------- |
+| `thenTierSwitcherIsValidated(product)`        | Buy page tier validation    |
+| `thenBillingTermSwitcherIsValidated(product)` | Buy page billing validation |
+| `thenProductCardsAreValidated(product)`       | Buy page cards validation   |
+
+## 🆚 **Migration Guide: BDD vs Fixtures**
+
+### **Traditional BDD (Deprecated) ❌**
+
+```typescript
+// OLD: Traditional Cucumber-style step definitions
+Given('user is on the {string} page', async ({ basePage }, pageSlug: string) => {
+  await basePage.navigateTo(pageSlug);
+});
+
+When('user accepts all cookies', async ({ cookieConsentDialog }) => {
+  await cookieConsentDialog.clickAcceptAll();
+});
+
+// Usage in .feature files
+test('BDD test', () => {
+  Given('user is on the "buy/idea" page');
+  When('user accepts all cookies');
+  Then('there are no errors in console');
+});
+```
+
+### **New: Common Fixtures Architecture (Recommended) ✅**
+
+```typescript
+// NEW: BDD-style step definitions as Playwright fixtures
+import { test } from '../Fixtures/CommonFixtures';
+
+test('should demonstrate new fixture approach', async ({
+  givenUserIsOnPage,
+  whenUserAcceptsCookies,
+  thenThereAreNoErrorsInConsole,
+}) => {
+  // Same readable BDD-style syntax, better performance & type safety
+  await givenUserIsOnPage('buy/idea');
+  await whenUserAcceptsCookies();
+  await thenThereAreNoErrorsInConsole();
+});
+```
+
+**Why Switch?**
+
+- 🚀 **Better Performance**: No Cucumber parsing overhead
+- 🎯 **Full TypeScript**: Autocompletion, type checking, refactoring support
+- 🔄 **Better Reusability**: Import fixtures across different test domains
+- 📦 **Simpler Setup**: Pure Playwright, no additional BDD plugins needed
+- 🛠️ **Easier Debugging**: Standard Playwright debugging tools work seamlessly
 
 ## 📊 Test Data Management
 
@@ -500,9 +653,11 @@ if (productName === commonConstants.PRODUCT_NAMES.IDEA) {
 }
 ```
 
-## ✅ Best Practices Checklist
+## ✅ **Best Practices Checklist**
 
-When creating new tests, ensure you:
+When creating new tests with the Common Fixtures architecture, ensure you:
+
+### **📋 Page Object Requirements**
 
 - [ ] **🚨 CRITICAL: Extend BasePage** - Every page object MUST extend BasePage or a domain base that extends BasePage
 - [ ] **❌ Never create BasePage instances** - Use inheritance, not composition with separate BasePage instances
@@ -510,19 +665,112 @@ When creating new tests, ensure you:
 - [ ] **Define constants** for all hardcoded strings, selectors, and values
 - [ ] **Use locator factory** to centralize and reuse locators
 - [ ] **Implement abstract methods** if extending base classes
-- [ ] **Add fixtures** for new page objects in `FixturesBDD.ts`
-- [ ] **Write step definitions** that use the factory pattern
+- [ ] **Call inherited methods via 'this'** - Never create separate instances of parent classes
+
+### **🏗️ Fixtures Architecture Requirements**
+
+- [ ] **Create domain-specific fixture files** that extend CommonFixtures
+- [ ] **Import from CommonFixtures** - Always extend the base layer, never duplicate common steps
+- [ ] **Use descriptive BDD-style method names** - `givenUserIsOnPage()`, `whenUserAcceptsCookies()`, `thenFeatureIsValidated()`
+- [ ] **Wrap steps in test.step()** for better reporting and debugging
+- [ ] **Type your fixture interfaces** - Extend `CommonFixtures` type for full type safety
+- [ ] **Export consistent API** - Always export `test` and `expect` from your fixture files
+
+### **📝 Test Writing Requirements**
+
+- [ ] **Import from domain-specific fixtures** - Use the highest-level fixture that has what you need
+- [ ] **Destructure fixtures in test parameters** - Get all needed step definitions in the test signature
+- [ ] **Mix common + domain-specific steps** - Use common steps for setup, domain steps for validation
 - [ ] **Store aria snapshots** in the `Data/aria/` folder
 - [ ] **Use common constants** instead of hardcoded values
 - [ ] **Follow naming conventions** (PascalCase for classes, camelCase for methods)
-- [ ] **Call inherited methods via 'this'** - Never create separate instances of parent classes
 
-## 🎯 Quick Start Template
+### **🔧 Architecture Compliance**
 
-Use this template for rapid page creation:
+- [ ] **Never duplicate common step logic** - Reuse CommonFixtures, don't recreate basic steps
+- [ ] **Keep domain separation clean** - Domain-specific logic in domain fixtures, common logic in CommonFixtures
+- [ ] **Maintain backward compatibility** - When modifying CommonFixtures, ensure all extensions still work
+- [ ] **Document new step definitions** - Add clear JSDoc comments explaining step purpose and parameters
+
+## 🎯 **Quick Start Templates**
+
+### **Template 1: New Domain Fixture File**
 
 ```bash
-# 1. Create folder structure
+# 1. Create your new domain fixture file
+touch e2e/Fixtures/YourNewDomainFixtures.ts
+```
+
+```typescript
+// YourNewDomainFixtures.ts
+import { test as baseTest, type CommonFixtures } from './CommonFixtures';
+import { YourNewPageFactory } from '#e2e/PagesAndComponents/YourNewPage/YourNewPageFactory';
+
+// Domain-specific step definitions
+async function thenYourFeatureIsValidated(factory: YourNewPageFactory, variant: string) {
+  await baseTest.step(`**THEN** your feature is validated on "${variant}" page`, async () => {
+    const page = factory.createPage(variant);
+    await page.validateYourFeature();
+  });
+}
+
+// Extend CommonFixtures
+export type YourNewDomainFixtures = CommonFixtures & {
+  yourNewPageFactory: YourNewPageFactory;
+  thenYourFeatureIsValidated: (variant: string) => Promise<void>;
+};
+
+export const test = baseTest.extend<YourNewDomainFixtures>({
+  yourNewPageFactory: async ({ page }, use) => {
+    await use(new YourNewPageFactory(page));
+  },
+  thenYourFeatureIsValidated: async ({ yourNewPageFactory }, use) => {
+    await use(async (variant: string) => {
+      await thenYourFeatureIsValidated(yourNewPageFactory, variant);
+    });
+  },
+});
+
+export const expect = baseTest.expect;
+```
+
+### **Template 2: New Test File**
+
+```bash
+# 1. Create your new test file in Features/
+touch e2e/Features/YourNewDomainTests.spec.ts
+```
+
+```typescript
+// YourNewDomainTests.spec.ts
+import { test } from '../Fixtures/YourNewDomainFixtures';
+
+test.describe('Your New Domain Tests', () => {
+  test('should validate complete flow', async ({
+    // Common steps (inherited automatically)
+    givenUserIsOnPage,
+    thenCookieConsentDialogIs,
+    whenUserAcceptsCookies,
+    andHeadingDisplays,
+    thenThereAreNoErrorsInConsole,
+
+    // Domain-specific steps
+    thenYourFeatureIsValidated,
+  }) => {
+    await givenUserIsOnPage('your/page');
+    await thenCookieConsentDialogIs('displayed');
+    await whenUserAcceptsCookies();
+    await andHeadingDisplays('Your Page Title');
+    await thenYourFeatureIsValidated('variantA');
+    await thenThereAreNoErrorsInConsole();
+  });
+});
+```
+
+### **Template 3: Page Object Structure**
+
+```bash
+# 1. Create page object folder structure
 mkdir e2e/PagesAndComponents/YourNewPage
 
 # 2. Create required files
@@ -531,21 +779,92 @@ touch e2e/PagesAndComponents/YourNewPage/YourNewPageLocatorFactory.ts
 touch e2e/PagesAndComponents/YourNewPage/BaseYourNewPage.ts
 touch e2e/PagesAndComponents/YourNewPage/YourNewPageFactory.ts
 touch e2e/PagesAndComponents/YourNewPage/SpecificYourNewPage.ts
-
-# 3. Create step definitions
-touch e2e/StepDefinitions/YourNewPageOperations.ts
-
-# 4. Create feature file
-touch e2e/Features/YourNewPageFeature.feature
 ```
 
-Then follow the patterns shown above to implement each file!
+Then follow the page object patterns shown in the inheritance section above!
 
-## 🤝 Getting Help
+## 🎓 **Learning Path & Examples**
 
-- Check existing implementations in `BuyPage/` folder for reference
-- Review `CommonConstants.ts` for available shared values
-- Look at `BasePage.ts` for inherited methods
-- Examine existing step definitions for pattern examples
+### **Study These Files (In Order)**
 
-Happy testing! 🚀
+1. **`CommonFixtures.ts`** - Understanding the base layer architecture
+2. **`ProductPurchaseJourneyFixtures.ts`** - How to extend CommonFixtures
+3. **`ProductPurchaseJourneyTests.spec.ts`** - Real-world fixture usage patterns
+4. **`BuyPage/` folder** - Page object implementation patterns
+5. **`BasePage.ts`** - Common methods available through inheritance
+
+### **Example: From BDD Step to Fixture**
+
+**Old BDD Approach:**
+
+```gherkin
+# .feature file
+Given user is on the "buy/idea" page
+When cookie consent dialog is "displayed"
+When user accepts all cookies
+Then tier switcher is validated on "idea" buy page
+```
+
+**New Fixture Approach:**
+
+```typescript
+// .spec.ts file
+test('buy page validation', async ({
+  givenUserIsOnPage, // From CommonFixtures
+  thenCookieConsentDialogIs, // From CommonFixtures
+  whenUserAcceptsCookies, // From CommonFixtures
+  thenTierSwitcherIsValidated, // From ProductPurchaseJourneyFixtures
+}) => {
+  await givenUserIsOnPage('buy/idea');
+  await thenCookieConsentDialogIs('displayed');
+  await whenUserAcceptsCookies();
+  await thenTierSwitcherIsValidated('idea');
+});
+```
+
+**Benefits Gained:**
+
+- ✅ Same readable BDD syntax
+- ✅ Full TypeScript autocompletion
+- ✅ Better performance (no Cucumber overhead)
+- ✅ Easier debugging with Playwright tools
+- ✅ Parameterized reusable functions
+
+## 🤝 **Getting Help**
+
+### **Reference Materials**
+
+- **CommonFixtures.ts** - Available common step definitions
+- **ProductPurchaseJourneyFixtures.ts** - Example of extending common fixtures
+- **BuyPage/ folder** - Page object implementation patterns
+- **BasePage.ts** - Inherited methods available to all pages
+- **CommonConstants.ts** - Available shared values and constants
+
+### **Common Questions**
+
+**Q: Should I use CommonFixtures or create domain-specific fixtures?**
+
+- Use **CommonFixtures** for simple tests that only need basic navigation/validation
+- Use **Domain Fixtures** (like ProductPurchaseJourneyFixtures) for tests that need domain-specific validations
+
+**Q: How do I add a new common step that all domains should use?**
+
+- Add it to **CommonFixtures.ts** so all domain fixtures inherit it automatically
+
+**Q: Can I mix fixture approaches?**
+
+- ✅ Yes! You can import and use both CommonFixtures and domain-specific fixtures as needed
+
+**Q: What if I need both BDD (.feature files) and plain Playwright (.spec.ts)?**
+
+- Use **fixtures for new tests** (better performance, type safety)
+- Keep existing BDD tests as-is (backward compatibility)
+- Gradually migrate BDD tests to fixtures as you touch them
+
+### **Migration Support**
+
+- Traditional BDD step definitions still work (in StepDefinitions/ folder)
+- New fixture approach is preferred for better performance and type safety
+- You can gradually migrate existing tests from BDD to fixtures
+
+Happy testing with the new Common Fixtures Architecture! 🚀
