@@ -33,9 +33,9 @@ e2e/
 │   │   └── CommonConstants.ts                     # Shared constants
 │   ├── BuyPage/
 │   │   ├── BaseBuyPage.ts                         # Abstract base with method contracts
-│   │   ├── IdeaBuyPage.ts                         # IntelliJ IDEA implementation
-│   │   ├── RustRoverBuyPage.ts                    # RustRover implementation
-│   │   ├── CLionBuyPage.ts                        # CLion implementation
+│   │   ├── ProductABuyPage.ts                     # Product A implementation (example)
+│   │   ├── ProductBBuyPage.ts                     # Product B implementation (example)
+│   │   ├── ProductCBuyPage.ts                     # Product C implementation (example)
 │   │   ├── BuyPageFactory.ts                      # Factory and convenience methods
 │   │   ├── BuyPageConstants.ts                    # UI text, product codes, ARIA snapshots
 │   │   └── BuyPageLocatorFactory.ts               # Centralized locator management
@@ -69,7 +69,7 @@ export class SimpleComponentPage extends BasePage {
 }
 
 // ✅ CORRECT - Extends domain-specific base (which extends BasePage)
-export class IdeaBuyPage extends BaseBuyPage {
+export class ProductABuyPage extends BaseBuyPage {
   // BaseBuyPage extends BasePage
   constructor(page: Page) {
     super(page); // Inherits BasePage + BaseBuyPage functionality
@@ -268,9 +268,9 @@ import * as yourNewPageLocatorFactory from './YourNewPageLocatorFactory';
 
 /**
  * ✅ CORRECT: Clean inheritance chain
- * VariantAYourNewPage → BaseYourNewPage → BasePage
+ * ProductVariantPage → BaseYourNewPage → BasePage
  */
-export class VariantAYourNewPage extends BaseYourNewPage {
+export class ProductVariantPage extends BaseYourNewPage {
   private readonly mainContainer: Locator;
   private readonly primaryButton: Locator;
   private locatorFactory: yourNewPageLocatorFactory.Locators;
@@ -547,7 +547,7 @@ When('user accepts all cookies', async ({ cookieConsentDialog }) => {
 
 // Usage in tests required importing step definitions separately
 test('traditional test', () => {
-  Given('user is on the "buy/idea" page');
+  Given('user is on the "buy/productA" page');
   When('user accepts all cookies');
   Then('there are no errors in console');
 });
@@ -565,7 +565,7 @@ test('should demonstrate new fixture approach', async ({
   thenThereAreNoErrorsInConsole,
 }) => {
   // Same readable BDD-style syntax, better performance & type safety
-  await givenUserIsOnPage('buy/idea');
+  await givenUserIsOnPage('buy/productA');
   await whenUserAcceptsCookies();
   await thenThereAreNoErrorsInConsole();
 });
@@ -689,8 +689,8 @@ await this.validateElementDisplayed(element, commonConstants.DISPLAYED);
 await this.validateElementDisplayed(element, commonConstants.NOT_DISPLAYED);
 
 // ✅ Use product names from constants
-if (productName === commonConstants.PRODUCT_NAMES.IDEA) {
-  // Handle IDEA-specific logic
+if (productName === commonConstants.PRODUCT_NAMES.PRODUCT_A) {
+  // Handle Product A-specific logic
 }
 ```
 
@@ -861,10 +861,10 @@ test('buy page validation', async ({
   whenUserAcceptsCookies, // From CommonFixtures
   thenTierSwitcherIsValidated, // From ProductPurchaseJourneyFixtures
 }) => {
-  await givenUserIsOnPage('buy/idea');
+  await givenUserIsOnPage('buy/productA');
   await andCookieConsentDialogIs('displayed');
   await whenUserAcceptsCookies();
-  await thenTierSwitcherIsValidated('idea');
+  await thenTierSwitcherIsValidated('productA');
 });
 ```
 

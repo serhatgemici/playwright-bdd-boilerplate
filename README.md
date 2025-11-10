@@ -1,6 +1,18 @@
-# Playwright BDD Test Automation Framework
+# E-commerce Test Automation Framework
 
-> A test automation framework combining **BDD readability** with **Playwright performance** through innovative Common Fixtures Architecture. Features inheritance-based page objects, centralized locator management, and BDD-style step definitions without Cucumber overhead.
+> An innovative test automation framework combining **BDD readability** with **Playwright performance** through revolutionary Common Fixtures Architecture. Features inheritance-based page objects, centralized locator management, and BDD-style step definitions without Cucumber overhead.
+
+## ⚠️ Important Disclaimer
+
+**This is an educational and demonstration framework** showcasing advanced test automation architectural patterns. The framework is designed to be **generic and adaptable** to any e-commerce website, though the current examples demonstrate testing patterns using a specific site for illustration purposes only.
+
+- 🎯 **Purpose**: Demonstrate innovative Common Fixtures Architecture and clean testing patterns
+- 🔧 **Focus**: Technical architecture and reusable testing frameworks, not site-specific functionality
+- 📚 **Educational**: Showcases best practices in test automation design and implementation
+- ⚖️ **Legal**: This is independent work not affiliated with or endorsed by any specific company
+- 🌐 **Generic**: Framework designed to work with any e-commerce site through configuration
+
+**Trademark Notice**: All product names, logos, and brands mentioned are property of their respective owners. Use of these names is for demonstration purposes only and does not imply any affiliation, endorsement, or relationship.
 
 ## 🏗️ Architecture Overview
 
@@ -38,6 +50,16 @@ Comprehensive guides are available in the `docs/` folder:
 1. **[Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)** (required)
 2. **[Java JDK](https://www.oracle.com/java/technologies/downloads/)** (optional for tests, required for Allure reports)
 3. **[Allure Report](https://allurereport.org/docs/install/)** (optional for tests, required for displaying reports)
+
+## 🌐 Framework Adaptability
+
+This framework is designed to be **easily adaptable** to any e-commerce website:
+
+- **Configurable Target URLs**: Simple environment configuration for any e-commerce site
+- **Generic Product Models**: Replace example products with your own catalog
+- **Flexible Page Objects**: Inherit from base classes and implement for your specific UI
+- **Reusable Step Definitions**: Common e-commerce patterns (cart, checkout, product selection)
+- **Modular Architecture**: Plug-and-play components for different site structures
 
 ## 🚀 Getting Started
 
@@ -90,7 +112,7 @@ This runs tests in headless mode, generates Allure reports, and serves them in y
 Commands follow the pattern: `action:environment:option`
 
 - **action**: `test` (headless) or `open` (interactive)
-- **environment**: `dev`, `stage`, `local` (currently all point to `https://www.jetbrains.com`)
+- **environment**: `dev`, `stage`, `local` (configurable target URLs for any e-commerce site)
 - **option**: Additional parameters like `report`
 
 Examples:
@@ -119,9 +141,9 @@ e2e/
 │   │   └── CommonConstants.ts                     # Shared constants
 │   ├── BuyPage/
 │   │   ├── BaseBuyPage.ts                         # Abstract base with method contracts
-│   │   ├── IdeaBuyPage.ts                         # IntelliJ IDEA implementation
-│   │   ├── RustRoverBuyPage.ts                    # RustRover implementation
-│   │   ├── CLionBuyPage.ts                        # CLion implementation
+│   │   ├── ProductABuyPage.ts                     # Product A implementation (example)
+│   │   ├── ProductBBuyPage.ts                     # Product B implementation (example)
+│   │   ├── ProductCBuyPage.ts                     # Product C implementation (example)
 │   │   ├── BuyPageFactory.ts                      # Factory and convenience methods
 │   │   ├── BuyPageConstants.ts                    # UI text, product codes, ARIA snapshots
 │   │   └── BuyPageLocatorFactory.ts               # Centralized locator management
@@ -165,12 +187,12 @@ Fixtures/
 
 ```typescript
 BasePage                    // e2e/PagesAndComponents/Common/BasePage.ts
-    ↓                       // Core functionality for ALL pages
+    ↓                       // Core page functionality for ALL pages
 BaseBuyPage                 // e2e/PagesAndComponents/BuyPage/BaseBuyPage.ts
-    ↓                       // Abstract buy page contracts
-IdeaBuyPage                 // e2e/PagesAndComponents/BuyPage/IdeaBuyPage.ts
-RustRoverBuyPage            // e2e/PagesAndComponents/BuyPage/RustRoverBuyPage.ts
-CLionBuyPage                // e2e/PagesAndComponents/BuyPage/CLionBuyPage.ts
+    ↓                       // Abstract buy page contracts for any e-commerce site
+ProductABuyPage             // e2e/PagesAndComponents/BuyPage/ProductABuyPage.ts
+ProductBBuyPage             // e2e/PagesAndComponents/BuyPage/ProductBBuyPage.ts
+ProductCBuyPage             // e2e/PagesAndComponents/BuyPage/ProductCBuyPage.ts
 ```
 
 #### 📋 **Abstract Method Contracts**
@@ -211,9 +233,9 @@ test('buy page validation', async ({
   thenBillingTermSwitcherIsValidated,
 }) => {
   // BDD-style test execution with full type safety
-  await givenUserIsOnPage('buy/idea');
+  await givenUserIsOnPage('buy/productA');
   await whenUserAcceptsCookies();
-  await thenTierSwitcherIsValidated('idea');
+  await thenTierSwitcherIsValidated('productA');
   await thenThereAreNoErrorsInConsole();
 });
 ```
@@ -250,11 +272,11 @@ export const test = baseTest.extend<NewDomainFixtures>({
 #### Using Page Object Inheritance
 
 ```typescript
-// ✅ CORRECT - All buy pages extend BaseBuyPage
-export class IdeaBuyPage extends BaseBuyPage {
+// ✅ CORRECT - All product pages extend BaseBuyPage
+export class ProductABuyPage extends BaseBuyPage {
   constructor(page: Page) {
     super(page);
-    // Implementation...
+    // Product-specific implementation...
   }
 }
 ```
@@ -327,7 +349,7 @@ test('@functional @accessibility cookie consent validation', async ({ ... }) => 
 });
 
 test.describe('@smoke Critical User Journeys', () => {
-  test('@business-critical IDEA buy page flow', async ({ ... }) => {
+  test('@business-critical Product A purchase flow', async ({ ... }) => {
     // Test implementation
   });
 });
@@ -400,7 +422,7 @@ test.only('@debug specific validation', async ({ ... }) => {
 3. **ProductPurchaseJourneyStepDefinitions.ts** - Domain-specific step definition functions
 4. **ProductPurchaseJourneyFixtures.ts** - See how to extend CommonFixtures with domain steps
 5. **ProductPurchaseJourneyTests.spec.ts** - Study fixture destructuring and usage patterns
-6. **IdeaBuyPage.ts** - Reference implementation for page object inheritance
+6. **ProductABuyPage.ts** - Reference implementation for page object inheritance
 7. **BaseBuyPage.ts** - Abstract contracts and inheritance patterns
 
 ### Key Concepts to Master

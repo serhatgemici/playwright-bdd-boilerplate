@@ -34,14 +34,14 @@ The framework now uses a **two-layer fixture system** that maintains BDD readabi
 
 - **BasePage.ts** provides core functionality for ALL page objects
 - **BaseBuyPage.ts** extends BasePage with buy-page specific abstractions
-- **Product pages** (IdeaBuyPage, RustRoverBuyPage, CLionBuyPage) extend BaseBuyPage
+- **Product pages** (ProductABuyPage, ProductBBuyPage, ProductCBuyPage) extend BaseBuyPage
 - Every page MUST extend appropriate base to avoid code duplication
 
 ```typescript
 // ✅ CORRECT - Proper inheritance chain
-BasePage → BaseBuyPage → IdeaBuyPage
-BasePage → BaseBuyPage → RustRoverBuyPage
-BasePage → BaseBuyPage → CLionBuyPage
+BasePage → BaseBuyPage → ProductABuyPage
+BasePage → BaseBuyPage → ProductBBuyPage
+BasePage → BaseBuyPage → ProductCBuyPage
 ```
 
 ### 2. **Abstract Method Contracts**
@@ -61,7 +61,7 @@ abstract validateDefaultStateOfProductCards(): Promise<void>;
 
 - **BuyPageLocatorFactory** provides all locators via factory pattern
 - **SELECTORS constants** centralize all CSS selectors
-- Product-specific factory methods (createIdeaLocators, createRustRoverLocators)
+- Product-specific factory methods (createProductALocators, createProductBLocators)
 - Single source of truth for locator logic
 
 ### 4. **Current Locator Strategy (Environment-Constrained)**
@@ -112,9 +112,9 @@ e2e/
 │   │   └── CommonConstants.ts                     # Shared constants
 │   ├── BuyPage/
 │   │   ├── BaseBuyPage.ts                         # Abstract base with method contracts
-│   │   ├── IdeaBuyPage.ts                         # IntelliJ IDEA implementation
-│   │   ├── RustRoverBuyPage.ts                    # RustRover implementation
-│   │   ├── CLionBuyPage.ts                        # CLion implementation
+│   │   ├── ProductABuyPage.ts                     # Product A implementation (example)
+│   │   ├── ProductBBuyPage.ts                     # Product B implementation (example)
+│   │   ├── ProductCBuyPage.ts                     # Product C implementation (example)
 │   │   ├── BuyPageFactory.ts                      # Factory and convenience methods
 │   │   ├── BuyPageConstants.ts                    # UI text, product codes, ARIA snapshots
 │   │   └── BuyPageLocatorFactory.ts               # Centralized locator management
@@ -171,9 +171,9 @@ test('buy page validation', async ({
   whenUserAcceptsCookies, // From CommonFixtures (inherited)
   thenTierSwitcherIsValidated, // From ProductPurchaseJourneyFixtures
 }) => {
-  await givenUserIsOnPage('buy/idea');
+  await givenUserIsOnPage('buy/productA');
   await whenUserAcceptsCookies();
-  await thenTierSwitcherIsValidated('idea');
+  await thenTierSwitcherIsValidated('productA');
 });
 ```
 
@@ -199,8 +199,8 @@ abstract class BaseBuyPage extends BasePage {
 }
 
 // Implementation layer - Product-specific pages
-class IdeaBuyPage extends BaseBuyPage {
-  // Implements all abstract methods for IDEA-specific behavior
+class ProductABuyPage extends BaseBuyPage {
+  // Implements all abstract methods for Product A-specific behavior
 }
 ```
 
@@ -216,8 +216,8 @@ export class BuyPageLocatorFactory {
   } as const;
 
   export class Locators {
-    createIdeaLocators() {
-      // IDEA-specific locator creation
+    createProductALocators() {
+      // Product A-specific locator creation
     }
 
     createRustRoverLocators() {
@@ -238,7 +238,7 @@ export class BuyPageLocatorFactory {
 import { test } from '../Fixtures/ProductPurchaseJourneyFixtures';
 
 test.describe('Product Purchase Journey', () => {
-  test('should validate complete IDEA buy page flow', async ({
+  test('should validate complete Product A buy page flow', async ({
     // Common step definitions (inherited automatically from CommonFixtures)
     givenUserIsOnPage,
     andCookieConsentDialogIs,
@@ -252,13 +252,13 @@ test.describe('Product Purchase Journey', () => {
     thenProductCardsAreValidated,
   }) => {
     // BDD-style test execution with full type safety
-    await givenUserIsOnPage('buy/idea');
+    await givenUserIsOnPage('buy/productA');
     await andCookieConsentDialogIs('displayed');
     await whenUserAcceptsCookies();
-    await andHeadingDisplays('IntelliJ IDEA');
-    await thenTierSwitcherIsValidated('idea');
-    await thenBillingTermSwitcherIsValidated('idea');
-    await thenProductCardsAreValidated('idea');
+    await andHeadingDisplays('Product A Premium');
+    await thenTierSwitcherIsValidated('productA');
+    await thenBillingTermSwitcherIsValidated('productA');
+    await thenProductCardsAreValidated('productA');
     await thenThereAreNoErrorsInConsole();
   });
 });
