@@ -26,7 +26,7 @@ test.describe('Product Purchase Journey Tests', () => {
     testData.forEach(({ caseId, productName, pageSlug, title }) => {
       test(`${caseId}: Validating default state of the "${productName}" buy page`, async ({
         givenUserIsOnPage,
-        thenCookieConsentDialogIs,
+        andCookieConsentDialogIs,
         whenUserAcceptsCookies,
         andHeadingDisplays,
         thenTierSwitcherIsValidated,
@@ -36,9 +36,9 @@ test.describe('Product Purchase Journey Tests', () => {
       }) => {
         // BDD-style step-by-step execution using parameterized fixtures
         await givenUserIsOnPage(pageSlug);
-        await thenCookieConsentDialogIs('displayed');
+        await andCookieConsentDialogIs('displayed');
         await whenUserAcceptsCookies();
-        await thenCookieConsentDialogIs('not displayed');
+        await andCookieConsentDialogIs('not displayed');
         await andHeadingDisplays(title);
         await thenTierSwitcherIsValidated(productName);
         await thenBillingTermSwitcherIsValidated(productName);

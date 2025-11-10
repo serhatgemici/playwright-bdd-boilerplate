@@ -4,47 +4,23 @@ import { BuyPageFactory } from '#e2e/PagesAndComponents/BuyPage/BuyPageFactory';
 import { IdeaBuyPage } from '#e2e/PagesAndComponents/BuyPage/IdeaBuyPage';
 import { RustRoverBuyPage } from '#e2e/PagesAndComponents/BuyPage/RustRoverBuyPage';
 import { CLionBuyPage } from '#e2e/PagesAndComponents/BuyPage/CLionBuyPage';
+import {
+  thenTierSwitcherIsValidated,
+  thenBillingTermSwitcherIsValidated,
+  thenProductCardsAreValidated,
+} from '../StepDefinitions/ProductPurchaseJourneyStepDefinitions';
 
 /**
- * Product Purchase Journey specific BDD-style step definitions
- * These extend the common fixtures and add buy page specific validations
+ * Product Purchase Journey Fixtures - Extension Layer
+ *
+ * This fixture provides:
+ * - Product-specific page objects (BuyPageFactory, product buy pages)
+ * - Domain-specific BDD-style step definition fixtures
+ * - Automatic inheritance of ALL CommonFixtures step definitions
+ *
+ * Step definitions are imported from ProductPurchaseJourneyStepDefinitions.ts to keep
+ * this file focused on fixture configuration and dependency injection.
  */
-
-// Buy Page Specific Step Definition: Then tier switcher is validated
-async function thenTierSwitcherIsValidated(buyPageFactory: BuyPageFactory, productName: string) {
-  await baseTest.step(
-    `**THEN** common tier switcher is validated on "${productName}" buy page`,
-    async () => {
-      const productPage = buyPageFactory.createBuyPage(productName);
-      await productPage.validateCommonTierSwitcher(productName);
-    }
-  );
-}
-
-// Buy Page Specific Step Definition: Then billing term switcher is validated
-async function thenBillingTermSwitcherIsValidated(
-  buyPageFactory: BuyPageFactory,
-  productName: string
-) {
-  await baseTest.step(
-    `**THEN** billing term switcher is validated on "${productName}" buy page`,
-    async () => {
-      const productPage = buyPageFactory.createBuyPage(productName);
-      await productPage.validateBillingTermSwitcher(productName);
-    }
-  );
-}
-
-// Buy Page Specific Step Definition: Then product cards are validated
-async function thenProductCardsAreValidated(buyPageFactory: BuyPageFactory, productName: string) {
-  await baseTest.step(
-    `**THEN** product cards are validated on "${productName}" buy page in default state`,
-    async () => {
-      const productPage = buyPageFactory.createBuyPage(productName);
-      await productPage.validateDefaultStateOfProductCards(productName);
-    }
-  );
-}
 
 // Extend CommonFixtures with Product Purchase Journey specific fixtures
 export type ProductPurchaseJourneyFixtures = CommonFixtures & {
