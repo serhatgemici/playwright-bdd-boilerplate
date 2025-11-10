@@ -281,15 +281,6 @@ export class IdeaBuyPage extends BaseBuyPage {
 
 ### ❌ **DON'T (Anti-patterns)**
 
-#### Don't Use Legacy BDD for New Tests
-
-```typescript
-// ❌ BAD - Traditional BDD approach (use for existing tests only)
-Given('user is on the {string} page', async ({ basePage }, pageSlug) => {
-  // Use CommonFixtures instead: givenUserIsOnPage(pageSlug)
-});
-```
-
 #### Don't Skip Common Fixtures Inheritance
 
 ```typescript
@@ -341,40 +332,76 @@ allure open allure-report
 
 ## 🏷️ Test Tagging Strategy
 
-### Custom Tags
+### Playwright Native Tags
 
-Tags can be applied at multiple levels:
+Tags are applied using Playwright's native `test()` function with the `@` annotation pattern in test descriptions:
 
-- **Feature** level
-- **Rule** level
-- **Scenario** level
-- **Scenario Outline** level
-- **Examples** level
+```typescript
+// Apply tags in test descriptions
+test('@smoke @business-critical buy page validation', async ({ ... }) => {
+  // Test implementation
+});
 
-Examples: `@smoke`, `@business-critical`, `@functional`, `@accessibility`
+test('@functional @accessibility cookie consent validation', async ({ ... }) => {
+  // Test implementation
+});
 
-### Tag Filtering
+test.describe('@smoke Critical User Journeys', () => {
+  test('@business-critical IDEA buy page flow', async ({ ... }) => {
+    // Test implementation
+  });
+});
+```
 
-Use logical operators for flexible test execution:
+### Tag Categories
+
+- **`@smoke`** - Critical functionality that must always work
+- **`@business-critical`** - Core business workflows
+- **`@functional`** - Feature-specific functional testing
+- **`@accessibility`** - ARIA snapshot and accessibility validation
+- **`@regression`** - Full regression suite testing
+- **`@integration`** - Cross-component integration tests
+
+### Tag Filtering with Playwright CLI
+
+Use Playwright's native `--grep` flag for flexible test execution:
 
 ```bash
 # Run only smoke tests
-TAGS="@smoke" npm run test:dev
+npx playwright test --grep "@smoke"
 
-# Run all tests except extras
-TAGS="not @extras" npm run test:dev
+# Run business-critical tests
+npx playwright test --grep "@business-critical"
 
 # Run smoke OR functional tests
-TAGS="@smoke or @functional" npm run test:dev
+npx playwright test --grep "@smoke|@functional"
 
-# Run business-critical AND not extras
-TAGS="@business-critical and not @extras" npm run test:dev
+# Run business-critical AND not accessibility tests
+npx playwright test --grep "@business-critical" --grep-invert "@accessibility"
+
+# Run all tests except regression
+npx playwright test --grep-invert "@regression"
 ```
 
-### Smart Tags
+### Smart Test Control
 
-- **`@skip`** - Skip specific tests
-- **`@only`** - Run only tagged tests (useful for debugging)
+- **`test.skip()`** - Skip specific tests programmatically
+- **`test.only()`** - Run only tagged tests (useful for debugging)
+- **`test.describe.skip()`** - Skip entire test suites
+- **`test.fixme()`** - Mark tests as known issues
+
+```typescript
+// Conditional skipping based on environment
+test('@smoke login validation', async ({ ... }) => {
+  test.skip(process.env.CI === 'true', 'Skipping in CI environment');
+  // Test implementation
+});
+
+// Focus on specific test during development
+test.only('@debug specific validation', async ({ ... }) => {
+  // Only this test will run
+});
+```
 
 ## 🚀 Getting Started for New Team Members
 
