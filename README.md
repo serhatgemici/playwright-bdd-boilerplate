@@ -190,26 +190,6 @@ abstract validateDefaultStateOfProductCards(): Promise<void>;
 - Single source of truth for locator management
 - Integrated with Common Fixtures for seamless usage
 
-### Legacy Structure (For Reference)
-
-The following structure shows the full project layout:
-
-```
-playwright-bdd-boilerplate/
-├── .features-gen/              # Generated spec files
-├── allure-report/              # Generated reports
-├── allure-results/             # Test results
-├── docs/                       # 📚 Comprehensive documentation
-│   ├── WRITING_NEW_TESTS.md
-│   ├── TESTING_STRATEGY.md
-│   ├── LOCATOR_STRATEGY.md
-│   └── REFACTORING_SUMMARY.md
-├── e2e/                        # Test implementation (see above)
-├── test-results/               # Playwright test results
-└── utils/                      # Helper utilities
-    └── readAriaSnapshot.ts
-```
-
 ## 🆕 Common Fixtures Usage Guide
 
 ### ✅ **DO (Common Fixtures Architecture)**
