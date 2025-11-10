@@ -17,10 +17,12 @@ This framework implements a **revolutionary two-layer Common Fixtures system** t
 ### Key Architectural Patterns
 
 - **Common Fixtures Pattern**: Two-layer system with base + domain-specific extensions
+- **Clean Step Definition Architecture**: Pure functions separated from fixture configuration
 - **Inheritance Chain**: `BasePage` → `BaseBuyPage` → Product-specific pages
 - **Abstract Method Contracts**: Enforced implementation of validation methods
 - **Locator Factory Pattern**: Centralized management via `BuyPageLocatorFactory`
 - **Constants Management**: UI text, product codes, and ARIA snapshots in dedicated files
+- **Separation of Concerns**: Step definitions (business logic) separate from fixtures (DI/config)
 
 ## 📚 Documentation
 
@@ -64,7 +66,7 @@ npx playwright install
 ### Interactive Mode (Recommended for Development)
 
 ```bash
-npm run open:dev:watch
+npm run open:dev
 ```
 
 This will:
@@ -89,13 +91,13 @@ Commands follow the pattern: `action:environment:option`
 
 - **action**: `test` (headless) or `open` (interactive)
 - **environment**: `dev`, `stage`, `local` (currently all point to `https://www.jetbrains.com`)
-- **option**: Additional parameters like `watch` or `report`
+- **option**: Additional parameters like `report`
 
 Examples:
 
 ```bash
 npm run test:dev:report    # Headless with report
-npm run open:dev:watch     # Interactive with file watching
+npm run open:dev           # Interactive with file watching
 ```
 
 ## 🏗️ Project Architecture
@@ -105,52 +107,58 @@ npm run open:dev:watch     # Interactive with file watching
 ```
 e2e/
 ├── Data/
-│   └── aria/                                    # ARIA snapshot files for validation
+│   └── aria/                                      # ARIA snapshot files for validation
 ├── Features/
-│   ├── @BuyPageOperations.feature               # 🔄 Traditional BDD feature files (backward compatibility)
-│   └── ProductPurchaseJourneyTests.spec.ts     # 🆕 Common Fixtures tests (.spec.ts files)
-├── Fixtures/                                    # 🆕 REVOLUTIONARY: BDD-style step definition fixtures
-│   ├── CommonFixtures.ts                       # 🆕 Base layer - common step definitions for ALL domains
-│   ├── ProductPurchaseJourneyFixtures.ts       # 🆕 Extension layer - domain-specific fixtures
-│   └── FixturesBDD.ts                           # 🔄 Legacy BDD fixtures (maintained for compatibility)
-├── PagesAndComponents/                          # Clean inheritance hierarchy
+│   └── ProductPurchaseJourneyTests.spec.ts        # 🆕 Common Fixtures tests (.spec.ts files)
+├── Fixtures/                                      # 🆕 BDD-style fixture configuration
+│   ├── CommonFixtures.ts                          # 🆕 Base layer - fixture configuration & DI
+│   └── ProductPurchaseJourneyFixtures.ts          # 🆕 Extension layer - domain fixture configuration
+├── PagesAndComponents/                            # Clean inheritance hierarchy
 │   ├── Common/
-│   │   ├── BasePage.ts                          # Core page functionality (ALL pages extend this)
-│   │   └── CommonConstants.ts                   # Shared constants
+│   │   ├── BasePage.ts                            # Core page functionality (ALL pages extend this)
+│   │   └── CommonConstants.ts                     # Shared constants
 │   ├── BuyPage/
-│   │   ├── BaseBuyPage.ts                       # Abstract base with method contracts
-│   │   ├── IdeaBuyPage.ts                       # IntelliJ IDEA implementation
-│   │   ├── RustRoverBuyPage.ts                  # RustRover implementation
-│   │   ├── CLionBuyPage.ts                      # CLion implementation
-│   │   ├── BuyPageFactory.ts                    # Factory and convenience methods
-│   │   ├── BuyPageConstants.ts                  # UI text, product codes, ARIA snapshots
-│   │   └── BuyPageLocatorFactory.ts             # Centralized locator management
+│   │   ├── BaseBuyPage.ts                         # Abstract base with method contracts
+│   │   ├── IdeaBuyPage.ts                         # IntelliJ IDEA implementation
+│   │   ├── RustRoverBuyPage.ts                    # RustRover implementation
+│   │   ├── CLionBuyPage.ts                        # CLion implementation
+│   │   ├── BuyPageFactory.ts                      # Factory and convenience methods
+│   │   ├── BuyPageConstants.ts                    # UI text, product codes, ARIA snapshots
+│   │   └── BuyPageLocatorFactory.ts               # Centralized locator management
 │   └── CookieConsentDialog/
-│       └── CookieConsentDialog.ts               # Cookie dialog handling
-└── StepDefinitions/                             # 🔄 LEGACY: Traditional BDD step definitions
-    ├── @BuyPageOperations.ts                    # (Use Fixtures/ for new tests)
-    └── Common/
-        └── CommonStepDefinitions.ts             # (Use CommonFixtures.ts for new common steps)
+│       ├── CookieConsentDialog.ts                 # Cookie dialog handling
+│       ├── CookieConsentDialogConstants.ts        # UI text, product codes, ARIA snapshots
+│       └── CookieConsentDialogLocatorFactory.ts   # Centralized locator management
+└── StepDefinitions/                               # 🆕 CLEAN ARCHITECTURE: Pure step definition functions
+    ├── CommonStepDefinitions.ts                   # 🆕 Common step functions (imported by CommonFixtures)
+    └── ProductPurchaseJourneyStepDefinitions.ts   # 🆕 Domain step functions (imported by domain fixtures)
 ```
 
 ### Architecture Principles
 
-#### 🆕 **Two-Layer Common Fixtures System**
+#### 🆕 **Two-Layer Common Fixtures System with Clean Step Definition Architecture**
 
 ```typescript
-// Layer 1: Base common step definitions for ALL domains
-CommonFixtures.ts
-├── givenUserIsOnPage(pageSlug: string)
-├── whenUserAcceptsCookies()
-├── thenThereAreNoErrorsInConsole()
-└── All shared BDD-style step definitions
+// Step Definition Functions (Pure Business Logic)
+StepDefinitions/
+├── CommonStepDefinitions.ts                    // Pure functions for common steps
+│   ├── givenUserIsOnPage(basePage, pageSlug)
+│   ├── whenUserAcceptsCookies(cookieDialog)
+│   └── thenThereAreNoErrorsInConsole(basePage)
+└── ProductPurchaseJourneyStepDefinitions.ts   // Pure functions for domain steps
+    ├── thenTierSwitcherIsValidated(factory, product)
+    └── thenBillingTermSwitcherIsValidated(factory, product)
     ↓
-// Layer 2: Domain-specific extensions (inherits ALL common automatically)
-ProductPurchaseJourneyFixtures.ts extends CommonFixtures
-├── ✅ ALL CommonFixtures inherited automatically
-├── thenTierSwitcherIsValidated(productName: string)
-├── thenBillingTermSwitcherIsValidated(productName: string)
-└── Domain-specific BDD-style step definitions
+// Fixture Configuration (Dependency Injection & Setup)
+Fixtures/
+├── CommonFixtures.ts                          // Base layer fixture configuration
+│   ├── Imports step functions from StepDefinitions/
+│   ├── Configures page objects (basePage, cookieDialog)
+│   └── Wires step functions with page objects via fixtures
+└── ProductPurchaseJourneyFixtures.ts         // Extension layer configuration
+    ├── Extends CommonFixtures (inherits ALL automatically ✅)
+    ├── Imports domain step functions from StepDefinitions/
+    └── Configures domain-specific page objects & step fixtures
 ```
 
 #### 🔗 **Page Object Inheritance Chain (Zero Code Duplication)**
@@ -233,14 +241,30 @@ test('buy page validation', async ({
 #### Creating New Domain Fixtures
 
 ```typescript
-// ✅ CORRECT - Extend CommonFixtures for new domains
+// ✅ STEP 1: Create pure step definition functions
+// StepDefinitions/NewDomainStepDefinitions.ts
+export async function thenNewDomainValidationPasses(domainPage: DomainPage): Promise<void> {
+  await test.step('**THEN** new domain validation passes', async () => {
+    await domainPage.validateDomainSpecificBehavior();
+  });
+}
+
+// ✅ STEP 2: Create fixture configuration that extends CommonFixtures
+// Fixtures/NewDomainFixtures.ts
 import { test as baseTest, type CommonFixtures } from './CommonFixtures';
+import { thenNewDomainValidationPasses } from '../StepDefinitions/NewDomainStepDefinitions';
 
 export type NewDomainFixtures = CommonFixtures & {
   // Domain-specific fixtures
   thenNewDomainValidationPasses: () => Promise<void>;
   // ALL CommonFixtures inherited automatically ✅
 };
+
+export const test = baseTest.extend<NewDomainFixtures>({
+  thenNewDomainValidationPasses: async ({ domainPage }, use) => {
+    await use(async () => await thenNewDomainValidationPasses(domainPage));
+  },
+});
 ```
 
 #### Using Page Object Inheritance
@@ -364,17 +388,21 @@ TAGS="@business-critical and not @extras" npm run test:dev
 
 ### Learning Path
 
-1. **CommonFixtures.ts** - Understand base layer with common step definitions
-2. **ProductPurchaseJourneyFixtures.ts** - See how to extend CommonFixtures
-3. **ProductPurchaseJourneyTests.spec.ts** - Study fixture destructuring and usage patterns
-4. **IdeaBuyPage.ts** - Reference implementation for page object inheritance
-5. **BaseBuyPage.ts** - Abstract contracts and inheritance patterns
+1. **CommonStepDefinitions.ts** - Understand pure step definition functions (business logic)
+2. **CommonFixtures.ts** - See how step functions are wired via fixtures (configuration)
+3. **ProductPurchaseJourneyStepDefinitions.ts** - Domain-specific step definition functions
+4. **ProductPurchaseJourneyFixtures.ts** - See how to extend CommonFixtures with domain steps
+5. **ProductPurchaseJourneyTests.spec.ts** - Study fixture destructuring and usage patterns
+6. **IdeaBuyPage.ts** - Reference implementation for page object inheritance
+7. **BaseBuyPage.ts** - Abstract contracts and inheritance patterns
 
 ### Key Concepts to Master
 
+- ✅ **Clean Architecture**: Step definitions (pure functions) separate from fixtures (configuration)
 - ✅ **Two-Layer Fixture System**: CommonFixtures (base) + Domain Extensions
 - ✅ **Automatic Inheritance**: Domain fixtures get ALL common steps automatically
 - ✅ **BDD-Style Syntax**: `givenUserIsOnPage()`, `whenUserAcceptsCookies()`, `thenTierSwitcherIsValidated()`
+- ✅ **Separation of Concerns**: Business logic in StepDefinitions/, DI/config in Fixtures/
 - ✅ **Type Safety**: Full autocompletion and compile-time validation
 - ✅ **Page Object Inheritance**: Always extend `BasePage` or `BaseBuyPage` appropriately
 
