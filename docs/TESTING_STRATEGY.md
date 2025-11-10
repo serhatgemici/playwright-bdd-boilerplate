@@ -6,7 +6,7 @@ This test automation framework follows modern best practices for maintainable, s
 
 ## 🆕 **Common Fixtures Architecture**
 
-The framework now uses a **revolutionary two-layer fixture system** that maintains BDD readability while leveraging plain Playwright performance:
+The framework now uses a **two-layer fixture system** that maintains BDD readability while leveraging plain Playwright performance:
 
 ### **Layer 1: CommonFixtures (Base Layer)**
 
