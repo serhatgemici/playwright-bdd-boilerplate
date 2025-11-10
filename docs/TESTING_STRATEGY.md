@@ -80,10 +80,12 @@ Due to no development team access, we use:
 3. **getByText()** - Business-readable content
 4. **getByLabel()** - Form elements
 
-### 5. **Common Fixtures Architecture**
+### 5. **Common Fixtures Architecture with Clean Separation**
 
-- **BDD-style step definitions** as reusable Playwright fixtures
+- **Clean Architecture**: Step definitions (pure functions) separate from fixture configuration
 - **Two-layer system**: CommonFixtures + Domain-specific extensions
+- **Step Functions**: Pure business logic in StepDefinitions/ folder
+- **Fixture Configuration**: Dependency injection and setup in Fixtures/ folder
 - **Parameterized functions**: `givenUserIsOnPage(pageSlug)` with full type safety
 - **Performance optimized**: Plain Playwright without Cucumber overhead
 
@@ -97,37 +99,46 @@ Due to no development team access, we use:
 
 ```
 e2e/
-├── Features/                          # Test files (.spec.ts) using fixture architecture
-│   └── ProductPurchaseJourneyTests.spec.ts  # Example domain-specific tests
-├── Fixtures/                         # 🆕 BDD-style step definition fixtures
-│   ├── CommonFixtures.ts             # Base layer - common step definitions
-│   └── ProductPurchaseJourneyFixtures.ts    # Extension layer - domain-specific
-├── PagesAndComponents/               # Page Object Model implementation
-│   ├── Common/                       # Shared components and utilities
-│   │   ├── BasePage.ts               # Base class for all pages
-│   │   └── CommonConstants.ts        # Cross-application constants
-│   ├── BuyPage/                      # Buy page domain folder
-│   │   ├── BaseBuyPage.ts            # Abstract base for buy pages
-│   │   ├── BuyPageConstants.ts       # Domain-specific constants
-│   │   ├── BuyPageFactory.ts         # Factory for creating buy page instances
-│   │   ├── BuyPageLocatorFactory.ts  # Centralized locator management
-│   │   ├── IdeaBuyPage.ts            # Product-specific implementation
-│   │   ├── RustRoverBuyPage.ts       # Product-specific implementation
-│   │   └── CLionBuyPage.ts           # Product-specific implementation
-│   └── CookieConsentDialog/          # Cookie consent component folder
-│       └── CookieConsentDialog.ts    # Component implementation
 ├── Data/
-│   └── aria/                         # ARIA snapshot files for validation
-└── StepDefinitions/                  # ⚠️ DEPRECATED: Traditional BDD step definitions
-    ├── Common/                       # (Use Fixtures/ instead for new tests)
-    │   └── CommonStepDefinitions.ts
-    └── @BuyPageOperations.ts         # Domain-specific steps
+│   └── aria/                                      # ARIA snapshot files for validation
+├── Features/
+│   └── ProductPurchaseJourneyTests.spec.ts        # 🆕 .spec.ts test files
+├── Fixtures/                                      # 🆕 BDD-style fixture configuration
+│   ├── CommonFixtures.ts                          # 🆕 Base layer - fixture configuration & DI
+│   └── ProductPurchaseJourneyFixtures.ts          # 🆕 Extension layer - domain fixture configuration
+├── PagesAndComponents/                            # Clean inheritance hierarchy
+│   ├── Common/
+│   │   ├── BasePage.ts                            # Core page functionality (ALL pages extend this)
+│   │   └── CommonConstants.ts                     # Shared constants
+│   ├── BuyPage/
+│   │   ├── BaseBuyPage.ts                         # Abstract base with method contracts
+│   │   ├── IdeaBuyPage.ts                         # IntelliJ IDEA implementation
+│   │   ├── RustRoverBuyPage.ts                    # RustRover implementation
+│   │   ├── CLionBuyPage.ts                        # CLion implementation
+│   │   ├── BuyPageFactory.ts                      # Factory and convenience methods
+│   │   ├── BuyPageConstants.ts                    # UI text, product codes, ARIA snapshots
+│   │   └── BuyPageLocatorFactory.ts               # Centralized locator management
+│   └── CookieConsentDialog/
+│       ├── CookieConsentDialog.ts                 # Cookie dialog handling
+│       ├── CookieConsentDialogConstants.ts        # UI text, product codes, ARIA snapshots
+│       └── CookieConsentDialogLocatorFactory.ts   # Centralized locator management
+└── StepDefinitions/                               # 🆕 CLEAN ARCHITECTURE: Pure step definition functions
+    ├── CommonStepDefinitions.ts                   # 🆕 Common step functions (imported by CommonFixtures)
+    └── ProductPurchaseJourneyStepDefinitions.ts   # 🆕 Domain step functions (imported by domain fixtures)
 ```
 
-### **Common Fixtures Hierarchy**
+### **Common Fixtures Hierarchy with Clean Architecture**
 
 ```typescript
-// Base layer - Common step definitions for ALL domains
+// Step Definition Functions (Pure Business Logic)
+// StepDefinitions/CommonStepDefinitions.ts
+export async function givenUserIsOnPage(basePage: BasePage, pageSlug: string): Promise<void>
+export async function andCookieConsentDialogIs(dialog: CookieConsentDialog, state: string): Promise<void>
+export async function whenUserAcceptsCookies(dialog: CookieConsentDialog): Promise<void>
+export async function thenThereAreNoErrorsInConsole(basePage: BasePage): Promise<void>
+export async function andHeadingDisplays(basePage: BasePage, title: string): Promise<void>
+    ↓ imported by
+// Fixture Configuration (Dependency Injection & Setup)
 // CommonFixtures.ts
 export type CommonFixtures = {
   // Core page objects
@@ -136,7 +147,7 @@ export type CommonFixtures = {
 
   // Common BDD-style step definition fixtures
   givenUserIsOnPage: (pageSlug: string) => Promise<void>;
-  thenCookieConsentDialogIs: (dialogState: string) => Promise<void>;
+  andCookieConsentDialogIs: (dialogState: string) => Promise<void>;
   whenUserAcceptsCookies: () => Promise<void>;
   thenThereAreNoErrorsInConsole: () => Promise<void>;
   andHeadingDisplays: (expectedTitle: string) => Promise<void>;
@@ -230,7 +241,7 @@ test.describe('Product Purchase Journey', () => {
   test('should validate complete IDEA buy page flow', async ({
     // Common step definitions (inherited automatically from CommonFixtures)
     givenUserIsOnPage,
-    thenCookieConsentDialogIs,
+    andCookieConsentDialogIs,
     whenUserAcceptsCookies,
     andHeadingDisplays,
     thenThereAreNoErrorsInConsole,
@@ -242,7 +253,7 @@ test.describe('Product Purchase Journey', () => {
   }) => {
     // BDD-style test execution with full type safety
     await givenUserIsOnPage('buy/idea');
-    await thenCookieConsentDialogIs('displayed');
+    await andCookieConsentDialogIs('displayed');
     await whenUserAcceptsCookies();
     await andHeadingDisplays('IntelliJ IDEA');
     await thenTierSwitcherIsValidated('idea');
@@ -268,10 +279,13 @@ test.describe('Product Purchase Journey', () => {
 
 ### Benefits of Common Fixtures Approach
 
+- ✅ **Clean Architecture**: Step definitions (pure functions) separate from fixtures (configuration)
 - ✅ **Better Performance**: Plain Playwright (no Cucumber parsing overhead)
 - ✅ **Type Safety**: Full TypeScript autocompletion and compile-time checks
 - ✅ **Reusability**: Common steps automatically available to all domains
-- ✅ **Maintainability**: Update common logic once, all domains benefit
+- ✅ **Maintainability**: Update step logic in one place, all fixtures benefit
+- ✅ **Testability**: Step functions can be unit tested independently
+- ✅ **Separation of Concerns**: Business logic in StepDefinitions/, DI/config in Fixtures/
 - ✅ **BDD Readability**: Maintains business-friendly step definition syntax
 
 ### Error Handling Strategy
@@ -397,16 +411,21 @@ test.describe('Product Purchase Journey', () => {
 
 #### **Learning Path**
 
-1. **Study CommonFixtures.ts** - Understand the base layer architecture
-2. **Examine ProductPurchaseJourneyFixtures.ts** - See how to extend common fixtures
-3. **Review ProductPurchaseJourneyTests.spec.ts** - Study real-world fixture usage
-4. **Study page object hierarchy** - Understand BasePage → BaseBuyPage → Product page chain
-5. **Use fixture templates** - Follow templates in WRITING_NEW_TESTS.md
+1. **Study CommonStepDefinitions.ts** - Understand pure step definition functions (business logic)
+2. **Study CommonFixtures.ts** - Understand the base layer fixture configuration
+3. **Examine ProductPurchaseJourneyStepDefinitions.ts** - Domain-specific step definition functions
+4. **Examine ProductPurchaseJourneyFixtures.ts** - See how to extend common fixtures with domain steps
+5. **Review ProductPurchaseJourneyTests.spec.ts** - Study real-world fixture usage patterns
+6. **Study page object hierarchy** - Understand BasePage → BaseBuyPage → Product page chain
+7. **Use fixture templates** - Follow templates in WRITING_NEW_TESTS.md
 
 #### **Quick Start Checklist**
 
+- [ ] Understand clean architecture: step definitions (pure functions) separate from fixtures (config)
 - [ ] Understand two-layer fixture system (Common + Domain)
 - [ ] Know when to use CommonFixtures vs domain-specific fixtures
+- [ ] Can create step definition functions in StepDefinitions/ folder
+- [ ] Can create fixture configuration that imports step functions
 - [ ] Can create new domain fixture by extending CommonFixtures
 - [ ] Understands BDD-style step definition naming conventions
 - [ ] Can write tests using destructured fixture parameters
@@ -424,17 +443,33 @@ test.describe('Product Purchase Journey', () => {
 
 #### **Creating New Domain Fixtures**
 
-1. **Create domain fixture file** - `YourNewDomainFixtures.ts`
-2. **Extend CommonFixtures** - `export type YourFixtures = CommonFixtures & { ... }`
-3. **Import from CommonFixtures** - `import { test as baseTest, type CommonFixtures } from './CommonFixtures'`
-4. **Add domain-specific steps** - Follow BDD naming: `thenYourFeatureIsValidated()`
-5. **Export consistent API** - Always export `test` and `expect`
+1. **Create step definition functions** - `YourNewDomainStepDefinitions.ts` with pure functions
+2. **Create domain fixture file** - `YourNewDomainFixtures.ts`
+3. **Import step functions** - `import { thenYourFeatureIsValidated } from '../StepDefinitions/YourNewDomainStepDefinitions'`
+4. **Extend CommonFixtures** - `export type YourFixtures = CommonFixtures & { ... }`
+5. **Import from CommonFixtures** - `import { test as baseTest, type CommonFixtures } from './CommonFixtures'`
+6. **Configure fixture wiring** - Connect step functions with page objects via fixtures
+7. **Export consistent API** - Always export `test` and `expect`
 
 #### **Example New Domain Implementation**
 
 ```typescript
-// AccountManagementFixtures.ts
+// Step 1: Create pure step definition functions
+// StepDefinitions/AccountManagementStepDefinitions.ts
+export async function thenProfileIsUpdated(
+  accountPageFactory: AccountPageFactory,
+  field: string
+): Promise<void> {
+  await test.step(`**THEN** profile field "${field}" is updated`, async () => {
+    const accountPage = accountPageFactory.createAccountPage();
+    await accountPage.validateProfileField(field);
+  });
+}
+
+// Step 2: Create fixture configuration
+// Fixtures/AccountManagementFixtures.ts
 import { test as baseTest, type CommonFixtures } from './CommonFixtures';
+import { thenProfileIsUpdated } from '../StepDefinitions/AccountManagementStepDefinitions';
 
 export type AccountManagementFixtures = CommonFixtures & {
   accountPageFactory: AccountPageFactory;
@@ -442,7 +477,16 @@ export type AccountManagementFixtures = CommonFixtures & {
 };
 
 export const test = baseTest.extend<AccountManagementFixtures>({
-  // Domain-specific fixtures here
+  accountPageFactory: async ({ page }, use) => {
+    const factory = new AccountPageFactory(page);
+    await use(factory);
+  },
+
+  thenProfileIsUpdated: async ({ accountPageFactory }, use) => {
+    await use(async (field: string) => {
+      await thenProfileIsUpdated(accountPageFactory, field);
+    });
+  },
 });
 ```
 
@@ -459,11 +503,14 @@ export const test = baseTest.extend<AccountManagementFixtures>({
 
 #### **Common Fixtures Benefits**
 
+- **Clean Architecture** - Step definitions (pure functions) separate from fixture configuration
 - **BDD-Style Readability** - `givenUserIsOnPage()` reads like traditional Cucumber steps
 - **Better Performance** - Plain Playwright without Cucumber parsing overhead
 - **Maximum Reusability** - Common steps automatically inherited by all domains
 - **Type Safety** - Full TypeScript autocompletion and compile-time checks
 - **Easy Extension** - New domains inherit all common functionality automatically
+- **Separation of Concerns** - Business logic in StepDefinitions/, DI/config in Fixtures/
+- **Testability** - Step definition functions can be unit tested independently
 
 #### **Page Object Benefits**
 

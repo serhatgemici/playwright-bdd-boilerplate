@@ -23,7 +23,7 @@ e2e/
 ├── Data/
 │   └── aria/                                      # ARIA snapshot files for validation
 ├── Features/
-│   └── ProductPurchaseJourneyTests.spec.ts        # 🆕 Common Fixtures tests (.spec.ts files)
+│   └── ProductPurchaseJourneyTests.spec.ts        # 🆕 .spec.ts test files
 ├── Fixtures/                                      # 🆕 BDD-style fixture configuration
 │   ├── CommonFixtures.ts                          # 🆕 Base layer - fixture configuration & DI
 │   └── ProductPurchaseJourneyFixtures.ts          # 🆕 Extension layer - domain fixture configuration
