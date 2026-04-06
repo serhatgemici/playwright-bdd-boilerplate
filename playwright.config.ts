@@ -67,7 +67,13 @@ const config: PlaywrightTestConfig = defineConfig({
     screenshot: 'only-on-failure', // save screenshots on failure
     locale: 'de-DE',
     timezoneId: 'Europe/Berlin',
-    video: 'retain-on-failure', // record video for each test, but only keep it if the test fails
+    video: {
+      mode: 'retain-on-failure', // record video for each test, but only keep it if the test fails
+      show: {
+        actions: { position: 'top-left' },
+        test: { position: 'top-right' },
+      },
+    },
   },
 });
 
