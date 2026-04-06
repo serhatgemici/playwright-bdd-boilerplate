@@ -11,7 +11,7 @@ Feature: User Registration
         @smoke
         Scenario: TC1 - Register a new user successfully
              When user enters signup name as "Serhat"
-              And user enters signup email address as "serhat@example.com"
+              And user enters signup email address as "serhat2@example.com"
               And user clicks on "Signup" button
              Then "ENTER ACCOUNT INFORMATION" text is "visible"
              When user selects title as "Mr."
@@ -40,8 +40,9 @@ Feature: User Registration
              Then "ACCOUNT DELETED!" text is "visible"
               And user clicks on "Continue" link
 
-        @negative @skip
+        @negative
         Scenario: TC5 - Register user with an already registered email address
-             When user enters a name and an already registered email address
-              And user clicks "Signup" button
-             Then the error message "Email Address already exist!" is "visible"
+             When user enters signup name as "Serhat"
+              And user enters signup email address as "serhat@example.com"
+              And user clicks on "Signup" button
+             Then "Email Address already exist!" text is "visible"
