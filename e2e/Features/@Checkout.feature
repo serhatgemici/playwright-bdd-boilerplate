@@ -5,9 +5,7 @@ Feature: Order Checkout and Payment
   So that I can purchase products successfully
 
         Background:
-            Given the user launches the browser
-              And the user navigates to "http://automationexercise.com"
-             Then the home page is visible successfully
+            Given the user has landed on the homepage
 
         
         Scenario: TC14 - Place order: Register during checkout

@@ -5,9 +5,7 @@ Feature: Shopping Cart Management
   So that I can prepare my order before checkout
 
         Background:
-            Given the user launches the browser
-              And the user navigates to "http://automationexercise.com"
-             Then the home page is visible successfully
+            Given the user has landed on the homepage
 
         @smoke
         Scenario: TC12 - Add multiple products to cart
