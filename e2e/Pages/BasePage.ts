@@ -39,6 +39,29 @@ class BasePage {
       console.log('No critical console errors found.');
     }
   }
+
+  async clickButtonByName(name: string) {
+    await this.page.getByRole('button', { name }).click();
+  }
+
+  async clickButtonByText(text: string) {
+    await this.page.locator(`button:has-text("${text}")`).click();
+  }
+
+  async clickLinkByText(linkText: string) {
+    await this.page.locator(`a:has-text("${linkText}")`).click();
+  }
+
+  async validateTextVisibility(elementText: string, state: string) {
+    const element = this.page.getByText(elementText);
+    if (state === 'visible') {
+      await element.waitFor({ state: 'visible' });
+    } else if (state === 'hidden') {
+      await element.waitFor({ state: 'hidden' });
+    } else {
+      throw new Error(`Invalid state: ${state}. Expected "visible" or "hidden".`);
+    }
+  }
 }
 
 export default BasePage;

@@ -5,16 +5,16 @@ Feature: Contact Us Form
   So that I can send enquiries to the website team
 
         Background:
-            Given the user has landed on the homepage
+            Given user has landed on the homepage
 
         @smoke
         Scenario: TC6 - Submit Contact Us form successfully
-             When the user clicks on "Contact Us" button
+             When user clicks on "Contact Us" button
              Then "GET IN TOUCH" text is "visible"
-             When the user enters name, email, subject and message
-              And the user uploads a file
-              And the user clicks "Submit" button
-              And the user clicks "OK" on the alert dialog
+             When user enters name, email, subject and message
+              And user uploads a file
+              And user clicks "Submit" button
+              And user clicks "OK" on the alert dialog
              Then the success message "Success! Your details have been submitted successfully." is "visible"
-             When the user clicks the "Home" button
-             Then the user is landed on the home page successfully
+             When user clicks the "Home" button
+             Then user is landed on the home page successfully

@@ -5,28 +5,28 @@ Feature: User Login and Logout
   So that I can securely access and exit my account
 
         Background:
-            Given the user has landed on the homepage
-             When the user clicks on "Signup / Login" button
+            Given user has landed on the homepage
+             When user clicks on "Signup / Login" button
              Then "Login to your account" text is "visible"
 
         @smoke
         Scenario: TC2 - Login with correct email and password
-             When the user enters a correct email address and password
-              And the user clicks "login" button
+             When user enters a correct email address and password
+              And user clicks "login" button
              Then "Logged in as username" text is "visible" at the top
-             When the user clicks "Delete Account" button
+             When user clicks "Delete Account" button
              Then "ACCOUNT DELETED!" text is "visible"
 
         @negative
         Scenario: TC3 - Login with incorrect email and password
-             When the user enters an incorrect email address and password
-              And the user clicks "login" button
+             When user enters an incorrect email address and password
+              And user clicks "login" button
              Then the error message "Your email or password is incorrect!" is "visible"
 
         @smoke
         Scenario: TC4 - Logout user
-             When the user enters a correct email address and password
-              And the user clicks "login" button
+             When user enters a correct email address and password
+              And user clicks "login" button
              Then "Logged in as username" text is "visible" at the top
-             When the user clicks "Logout" button
-             Then the user is navigated to the login page
+             When user clicks "Logout" button
+             Then user is navigated to the login page

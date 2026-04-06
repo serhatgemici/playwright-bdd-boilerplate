@@ -87,6 +87,7 @@ const config: PlaywrightTestConfig = defineConfig({
         test: { position: 'top-right' },
       },
     },
+    testIdAttribute: 'data-qa', // set a custom attribute to uniquely identify elements in the application, instead of using default attributes like 'data-testid' or 'data-test-id'
   },
 });
 

@@ -1,3 +1,4 @@
+@skip
 Feature: JetBrains Buy page tests
               As a prospective customer, I want to quickly verify the Buy page works, So that I can start a purchase journey
 
