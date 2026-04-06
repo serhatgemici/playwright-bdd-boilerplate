@@ -1,8 +1,0 @@
-- button "For Individual Use":
-    - img:
-        - img
-    - text: For Individual Use
-- button "For Organizations":
-    - img:
-        - img
-    - text: For Organizations
