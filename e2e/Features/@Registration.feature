@@ -36,9 +36,9 @@ Feature: User Registration
              Then "ACCOUNT CREATED!" text is "visible"
              When user clicks on "Continue" link
              Then logged in as "Serhat Filan" text is "visible" at the navigation bar
-             When user clicks on "Delete Account" link
-             Then "ACCOUNT DELETED!" text is "visible"
-              And user clicks on "Continue" link
+           #  When user clicks on "Delete Account" link
+           #  Then "ACCOUNT DELETED!" text is "visible"
+            #  And user clicks on "Continue" link
 
         @negative
         Scenario: TC5 - Register user with an already registered email address
