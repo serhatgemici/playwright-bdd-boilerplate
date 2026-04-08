@@ -23,12 +23,12 @@ Feature: User Registration
 
               And user enters first name as "random"
               And user enters last name as "random"
-              And user enters company as "Example Inc."
-              And user enters address as "123 Main St"
-              And user enters address2 as "Apt 4B"
-              And user selects country as "United States"
-              And user enters state as "California"
-              And user enters city as "Los Angeles"
+              And user enters company as "random"
+              And user enters address as "random"
+              And user enters address2 as "random"
+              And user selects country as "random"
+              And user enters state as "random"
+              And user enters city as "random"
               And user enters zipcode as "random"
               And user enters mobile number as "random"
           
