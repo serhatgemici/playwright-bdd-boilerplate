@@ -1,5 +1,4 @@
 import { Given, When, Then } from '#e2e/Fixtures/FixturesBDD.ts';
-import { getCurrentUserData } from '#utils/dataGenerator';
 
 Then('there are no errors in console', ({ basePage }) => {
   basePage.checkForCriticalConsoleErrors();
@@ -29,16 +28,19 @@ When('user clicks on {string} link', async ({ basePage }, linkText: string) => {
 });
 
 Then(
-  'logged in as {string} text is {string} at the navigation bar',
-  async ({ navigationBar }, username: string, state: string) => {
-    await navigationBar.validateLoggedInAsText(username, state);
+  'logged in as {string} text is visible at the navigation bar',
+  async ({ navigationBar }, username: string) => {
+    await navigationBar.validateLoggedInAsText(username);
   }
 );
 
 Then(
-  'logged in as generated name text is {string} at the navigation bar',
-  async ({ navigationBar }, state: string) => {
-    const userData = getCurrentUserData();
-    await navigationBar.validateLoggedInAsText(userData.fullName, state);
+  'logged in as text displays the full name of the user correctly',
+  async ({ navigationBar, ctx }) => {
+    if (!ctx.randomAccountData) {
+      throw new Error('Account data is not available');
+    }
+
+    await navigationBar.validateLoggedInAsText(ctx.randomAccountData.name);
   }
 );

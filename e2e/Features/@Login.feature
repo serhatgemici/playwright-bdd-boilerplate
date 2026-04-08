@@ -13,7 +13,7 @@ Feature: User Login and Logout
              When user enters login email as "serhat2@example.com"
               And user enters login password as "password123"
               And user clicks on "login" button
-             Then logged in as "Serhat Filan" text is "visible" at the navigation bar
+             Then logged in as "Serhat Filan" text is visible at the navigation bar
 
 
         @negative
@@ -28,6 +28,6 @@ Feature: User Login and Logout
              When user enters login email as "serhat2@example.com"
               And user enters login password as "password123"
               And user clicks on "login" button
-             Then logged in as "Serhat Filan" text is "visible" at the navigation bar
+             Then logged in as "Serhat Filan" text is visible at the navigation bar
              When user clicks on "Logout" on the navigation bar
              #Then user is navigated to the login page

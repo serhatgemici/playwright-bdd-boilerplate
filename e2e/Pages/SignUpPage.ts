@@ -1,7 +1,11 @@
 import { Page, Locator } from '@playwright/test';
 
 import BasePage from '#e2e/Pages/BasePage';
-import { getCurrentUserData } from '#utils/dataGenerator';
+import { generateRandomUserData } from '#utils/dataGenerator';
+import { type AccountData } from '#utils/types';
+
+const CREATE_ACCOUNT_SUCCESS_CODE = 201;
+const CREATE_ACCOUNT_SUCCESS_MESSAGE = 'User created!';
 
 class SignUpPage {
   page: Page;
@@ -65,8 +69,7 @@ class SignUpPage {
   }
 
   async enterName(name: string): Promise<void> {
-    const value = name === 'random' ? getCurrentUserData().fullName : name;
-    await this.nameInput.fill(value);
+    await this.nameInput.fill(name);
   }
 
   async enterEmail(email: string): Promise<void> {
@@ -74,8 +77,7 @@ class SignUpPage {
   }
 
   async enterPassword(password: string): Promise<void> {
-    const value = password === 'random' ? getCurrentUserData().password : password;
-    await this.passwordInput.fill(value);
+    await this.passwordInput.fill(password);
   }
 
   async selectDateOfBirth(day: string, month: string, year: string): Promise<void> {
@@ -85,12 +87,7 @@ class SignUpPage {
   }
 
   async selectDateOfBirthAs(value: string): Promise<void> {
-    if (value === 'random') {
-      const { day, month, year } = getCurrentUserData().dateOfBirth;
-      await this.selectDateOfBirth(day, month, year);
-    } else {
-      await this.selectDateOfBirth(value, value, value);
-    }
+    await this.selectDateOfBirth(value, value, value);
   }
 
   async toggleNewsletterCheckbox(): Promise<void> {
@@ -110,23 +107,19 @@ class SignUpPage {
   }
 
   async fillFirstName(firstName: string): Promise<void> {
-    const value = firstName === 'random' ? getCurrentUserData().firstName : firstName;
-    await this.firstNameInput.fill(value);
+    await this.firstNameInput.fill(firstName);
   }
 
   async fillLastName(lastName: string): Promise<void> {
-    const value = lastName === 'random' ? getCurrentUserData().lastName : lastName;
-    await this.lastNameInput.fill(value);
+    await this.lastNameInput.fill(lastName);
   }
 
   async fillZipcode(zipcode: string): Promise<void> {
-    const value = zipcode === 'random' ? getCurrentUserData().zipcode : zipcode;
-    await this.zipcodeInput.fill(value);
+    await this.zipcodeInput.fill(zipcode);
   }
 
   async fillMobileNumber(mobileNumber: string): Promise<void> {
-    const value = mobileNumber === 'random' ? getCurrentUserData().mobileNumber : mobileNumber;
-    await this.mobileNumberInput.fill(value);
+    await this.mobileNumberInput.fill(mobileNumber);
   }
 
   async fillCompany(company: string): Promise<void> {
@@ -151,6 +144,40 @@ class SignUpPage {
 
   async fillCity(city: string): Promise<void> {
     await this.cityInput.fill(city);
+  }
+
+  async createAccountViaApi(payload: AccountData): Promise<void> {
+    const response = await this.page.request.post(
+      'https://automationexercise.com/api/createAccount',
+      {
+        form: payload,
+      }
+    );
+
+    const responseBody = (await response.json()) as {
+      responseCode?: number;
+      message?: string;
+    };
+
+    if (!response.ok()) {
+      throw new Error(
+        `createAccount API call failed with HTTP ${response.status()}: ${JSON.stringify(responseBody)}`
+      );
+    }
+
+    // Endpoint may return HTTP 200 while exposing API-level code in response body.
+    const apiResponseCode = responseBody.responseCode ?? response.status();
+    if (
+      apiResponseCode !== CREATE_ACCOUNT_SUCCESS_CODE ||
+      responseBody.message !== CREATE_ACCOUNT_SUCCESS_MESSAGE
+    ) {
+      throw new Error(`Unexpected createAccount response: ${JSON.stringify(responseBody)}`);
+    }
+  }
+
+  async createRandomUserViaApi(userData?: AccountData): Promise<void> {
+    const payload = userData ?? generateRandomUserData();
+    await this.createAccountViaApi(payload);
   }
 }
 

@@ -4,12 +4,18 @@ import BasePage from '#e2e/Pages/BasePage';
 import NavigationBar from '#e2e/Pages/NavigationBar.ts';
 import LoginPage from '#e2e/Pages/LoginPage.ts';
 import SignUpPage from '#e2e/Pages/SignUpPage.ts';
+import type { AccountData } from '#utils/types';
+
+type Ctx = {
+  randomAccountData?: AccountData;
+};
 
 type Fixtures = {
   basePage: BasePage;
   navigationBar: NavigationBar;
   loginPage: LoginPage;
   signUpPage: SignUpPage;
+  ctx: Ctx;
 };
 
 export const test = base.extend<Fixtures>({
@@ -28,6 +34,9 @@ export const test = base.extend<Fixtures>({
   signUpPage: async ({ page }, use) => {
     const signUpPage = new SignUpPage(page);
     await use(signUpPage);
+  },
+  ctx: async ({}, use) => {
+    await use({});
   },
 });
 

@@ -35,36 +35,13 @@ Feature: User Registration
               And user clicks on "Create Account" button
              Then "ACCOUNT CREATED!" text is "visible"
              When user clicks on "Continue" link
-             Then logged in as generated name text is "visible" at the navigation bar
+             Then logged in as text displays the full name of the user correctly
 
         @smoke
         Scenario: TC2 - Delete a registered account
-             When user enters signup name as "TestDelete"
-              And user enters signup email address as "random"
-              And user clicks on "Signup" button
-             Then "ENTER ACCOUNT INFORMATION" text is "visible"
-             When user selects title as "Mr."
-              And user enters name as "Delete User"
-              And user enters password as "password123"
-              And user selects date of birth as "1", "January", "1990"
-              And user selects the "newsletter" checkbox
-              And user selects the "special offers" checkbox
-
-              And user enters first name as "Delete"
-              And user enters last name as "User"
-              And user enters company as "Example Inc."
-              And user enters address as "123 Main St"
-              And user enters address2 as "Apt 4B"
-              And user selects country as "United States"
-              And user enters state as "California"
-              And user enters city as "Los Angeles"
-              And user enters zipcode as "90001"
-              And user enters mobile number as "+1234567890"
-          
-              And user clicks on "Create Account" button
-             Then "ACCOUNT CREATED!" text is "visible"
-             When user clicks on "Continue" link
-             Then logged in as "Delete User" text is "visible" at the navigation bar
+            Given random user created by api call
+              And user is logged in as "api_created_user"
+              And logged in as text displays the full name of the user correctly
              When user clicks on "Delete Account" link
              Then "ACCOUNT DELETED!" text is "visible"
               And user clicks on "Continue" link

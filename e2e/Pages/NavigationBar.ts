@@ -42,15 +42,9 @@ class NavigationBar {
     await navBarItem.click();
   }
 
-  async validateLoggedInAsText(username: string, state: string) {
-    const loggedInAsText = this.page.getByText(`Logged in as ${username}`);
-    if (state === 'visible') {
-      await expect(loggedInAsText).toBeVisible();
-    } else if (state === 'not visible') {
-      await expect(loggedInAsText).not.toBeVisible();
-    } else {
-      throw new Error(`Invalid state: ${state}. Expected "visible" or "not visible".`);
-    }
+  async validateLoggedInAsText(fullName: string) {
+    const loggedInAsText = this.page.getByText(`Logged in as ${fullName}`);
+    await expect(loggedInAsText).toBeVisible();
   }
 }
 

@@ -35,13 +35,13 @@ const reporters: ReporterDescription[] = [
 const config: PlaywrightTestConfig = defineConfig({
   testDir,
   reporter: reporters,
-  retries: process.env.CI ? 1 : 1,
-  timeout: 120000, // overal timeout for each test
+  retries: process.env.CI ? 1 : 0,
+  timeout: 120000, // overall timeout for each test
   expect: {
     timeout: 13000, //timeout for expect assertions
   },
   fullyParallel: true,
-  workers: process.env.CI ? 4 : 3,
+  workers: process.env.CI ? 4 : 8,
   projects: [
     {
       name: 'Develop',

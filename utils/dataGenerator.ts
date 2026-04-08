@@ -3,21 +3,7 @@
  * Generates random but valid and realistic test data for registration scenarios
  */
 
-interface TestUserData {
-  signupName: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  fullName: string;
-  password: string;
-  dateOfBirth: {
-    day: string;
-    month: string;
-    year: string;
-  };
-  zipcode: string;
-  mobileNumber: string;
-}
+import { type AccountData } from './types';
 
 /**
  * Generates a random email address
@@ -162,59 +148,88 @@ export function generateRandomMobileNumber(): string {
 }
 
 /**
+ * Generates a random title value accepted by the API
+ */
+export function generateRandomTitle(): string {
+  const titles = ['Mr', 'Mrs', 'Miss'];
+  return titles[Math.floor(Math.random() * titles.length)];
+}
+
+/**
+ * Generates a random company name
+ */
+export function generateRandomCompany(): string {
+  const prefixes = ['North', 'Blue', 'Prime', 'Summit', 'Evergreen', 'Nova'];
+  const nouns = ['Labs', 'Systems', 'Holdings', 'Solutions', 'Works', 'Dynamics'];
+  return `${prefixes[Math.floor(Math.random() * prefixes.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`;
+}
+
+/**
+ * Generates a random street address line 1
+ */
+export function generateRandomAddress1(): string {
+  const streetNames = ['Main', 'Oak', 'Maple', 'Cedar', 'Pine', 'Sunset'];
+  const streetTypes = ['St', 'Ave', 'Blvd', 'Rd', 'Ln', 'Dr'];
+  const number = Math.floor(Math.random() * 8999) + 100;
+  return `${number} ${streetNames[Math.floor(Math.random() * streetNames.length)]} ${streetTypes[Math.floor(Math.random() * streetTypes.length)]}`;
+}
+
+/**
+ * Generates a random secondary address line
+ */
+export function generateRandomAddress2(): string {
+  const unit = Math.floor(Math.random() * 80) + 1;
+  return `Apt ${unit}`;
+}
+
+/**
+ * Generates a random country value from the signup dropdown set
+ */
+export function generateRandomCountry(): string {
+  const countries = ['United States', 'Canada', 'India', 'Australia', 'Israel', 'New Zealand'];
+  return countries[Math.floor(Math.random() * countries.length)];
+}
+
+/**
+ * Generates a random US-like state/city combination
+ */
+export function generateRandomStateCity(): { state: string; city: string } {
+  const pairs = [
+    { state: 'California', city: 'Los Angeles' },
+    { state: 'Texas', city: 'Austin' },
+    { state: 'New York', city: 'Buffalo' },
+    { state: 'Florida', city: 'Miami' },
+    { state: 'Washington', city: 'Seattle' },
+  ];
+  return pairs[Math.floor(Math.random() * pairs.length)];
+}
+
+/**
  * Generates complete random test user data
  */
-export function generateRandomUserData(): TestUserData {
+export function generateRandomUserData(): AccountData {
   const firstName = generateRandomFirstName();
   const lastName = generateRandomLastName();
+  const stateCity = generateRandomStateCity();
+  const dateOfBirth = generateRandomDateOfBirth();
 
   return {
-    signupName: firstName,
+    name: `${firstName} ${lastName}`,
     email: generateRandomEmail(),
-    firstName,
-    lastName,
-    fullName: `${firstName} ${lastName}`,
     password: generateRandomPassword(),
-    dateOfBirth: generateRandomDateOfBirth(),
+    title: generateRandomTitle(),
+    birth_date: dateOfBirth.day,
+    birth_month: dateOfBirth.month,
+    birth_year: dateOfBirth.year,
+    firstname: firstName,
+    lastname: lastName,
+    company: generateRandomCompany(),
+    address1: generateRandomAddress1(),
+    address2: generateRandomAddress2(),
+    country: generateRandomCountry(),
     zipcode: generateRandomZipcode(),
-    mobileNumber: generateRandomMobileNumber(),
+    state: stateCity.state,
+    city: stateCity.city,
+    mobile_number: generateRandomMobileNumber(),
   };
-}
-
-/**
- * Storage for generated data within a test context
- */
-let currentUserData: TestUserData | null = null;
-
-/**
- * Set the current user data for the test session
- */
-export function setCurrentUserData(data: TestUserData): void {
-  currentUserData = data;
-}
-
-/**
- * Get the current user data for the test session
- */
-export function getCurrentUserData(): TestUserData {
-  if (!currentUserData) {
-    currentUserData = generateRandomUserData();
-  }
-  return currentUserData;
-}
-
-/**
- * Clear the current user data
- */
-export function clearCurrentUserData(): void {
-  currentUserData = null;
-}
-
-/**
- * Initialize new user data for a test
- */
-export function initializeNewUserData(): TestUserData {
-  const userData = generateRandomUserData();
-  setCurrentUserData(userData);
-  return userData;
 }
