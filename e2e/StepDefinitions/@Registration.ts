@@ -47,8 +47,13 @@ When('user enters signup email address as {string}', async ({ loginPage, ctx }, 
   }
 });
 
-When('user selects title as {string}', async ({ signUpPage }, title: string) => {
-  await signUpPage.selectTitleAs(title);
+When('user selects title as {string}', async ({ signUpPage, ctx }, title: string) => {
+  if (title === 'random') {
+    const randomAccountData = getRandomAccountData(ctx);
+    await signUpPage.selectTitleAs(randomAccountData.title);
+  } else {
+    await signUpPage.selectTitleAs(title);
+  }
 });
 
 When('user enters name as {string}', async ({ signUpPage, ctx }, name: string) => {

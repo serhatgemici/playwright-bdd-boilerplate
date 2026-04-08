@@ -14,7 +14,7 @@ Feature: User Registration
               And user enters signup email address as "random"
               And user clicks on "Signup" button
              Then "ENTER ACCOUNT INFORMATION" text is "visible"
-             When user selects title as "Mr."
+             When user selects title as "random"
               And user enters name as "random"
               And user enters password as "random"
               And user selects date of birth as "random"
