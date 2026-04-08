@@ -1,6 +1,7 @@
 import { Page, Locator } from '@playwright/test';
 
 import BasePage from '#e2e/Pages/BasePage';
+import { getCurrentUserData } from '#utils/dataGenerator';
 
 class SignUpPage {
   page: Page;
@@ -64,7 +65,8 @@ class SignUpPage {
   }
 
   async enterName(name: string): Promise<void> {
-    await this.nameInput.fill(name);
+    const value = name === 'random' ? getCurrentUserData().fullName : name;
+    await this.nameInput.fill(value);
   }
 
   async enterEmail(email: string): Promise<void> {
@@ -72,7 +74,8 @@ class SignUpPage {
   }
 
   async enterPassword(password: string): Promise<void> {
-    await this.passwordInput.fill(password);
+    const value = password === 'random' ? getCurrentUserData().password : password;
+    await this.passwordInput.fill(value);
   }
 
   async selectDateOfBirth(day: string, month: string, year: string): Promise<void> {
@@ -81,12 +84,73 @@ class SignUpPage {
     await this.yearOfBirthSelect.selectOption(year);
   }
 
+  async selectDateOfBirthAs(value: string): Promise<void> {
+    if (value === 'random') {
+      const { day, month, year } = getCurrentUserData().dateOfBirth;
+      await this.selectDateOfBirth(day, month, year);
+    } else {
+      await this.selectDateOfBirth(value, value, value);
+    }
+  }
+
   async toggleNewsletterCheckbox(): Promise<void> {
     await this.newsletterCheckbox.click();
   }
 
   async toggleSpecialOffersCheckbox(): Promise<void> {
     await this.specialOffersCheckbox.click();
+  }
+
+  async toggleCheckbox(name: string): Promise<void> {
+    const checkboxMap: Record<string, () => Promise<void>> = {
+      newsletter: () => this.toggleNewsletterCheckbox(),
+      'special offers': () => this.toggleSpecialOffersCheckbox(),
+    };
+    await checkboxMap[name]();
+  }
+
+  async fillFirstName(firstName: string): Promise<void> {
+    const value = firstName === 'random' ? getCurrentUserData().firstName : firstName;
+    await this.firstNameInput.fill(value);
+  }
+
+  async fillLastName(lastName: string): Promise<void> {
+    const value = lastName === 'random' ? getCurrentUserData().lastName : lastName;
+    await this.lastNameInput.fill(value);
+  }
+
+  async fillZipcode(zipcode: string): Promise<void> {
+    const value = zipcode === 'random' ? getCurrentUserData().zipcode : zipcode;
+    await this.zipcodeInput.fill(value);
+  }
+
+  async fillMobileNumber(mobileNumber: string): Promise<void> {
+    const value = mobileNumber === 'random' ? getCurrentUserData().mobileNumber : mobileNumber;
+    await this.mobileNumberInput.fill(value);
+  }
+
+  async fillCompany(company: string): Promise<void> {
+    await this.companyInput.fill(company);
+  }
+
+  async fillAddress(address: string): Promise<void> {
+    await this.addressInput.fill(address);
+  }
+
+  async fillAddress2(address2: string): Promise<void> {
+    await this.address2Input.fill(address2);
+  }
+
+  async selectCountry(country: string): Promise<void> {
+    await this.countrySelect.selectOption(country);
+  }
+
+  async fillState(state: string): Promise<void> {
+    await this.stateInput.fill(state);
+  }
+
+  async fillCity(city: string): Promise<void> {
+    await this.cityInput.fill(city);
   }
 }
 

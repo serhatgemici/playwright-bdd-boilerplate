@@ -1,6 +1,7 @@
 import { Page, Locator } from '@playwright/test';
 
 import BasePage from '#e2e/Pages/BasePage';
+import { getCurrentUserData } from '#utils/dataGenerator';
 
 class LoginPage {
   page: Page;
@@ -30,6 +31,16 @@ class LoginPage {
   }
 
   // METHODS
+  async fillSignupName(name: string): Promise<void> {
+    const value = name === 'random' ? getCurrentUserData().signupName : name;
+    await this.signupNameInput.fill(value);
+  }
+
+  async fillSignupEmail(email: string): Promise<void> {
+    const value = email === 'random' ? getCurrentUserData().email : email;
+    await this.signupEmailInput.fill(value);
+  }
+
   async login(email: string, password: string): Promise<void> {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);

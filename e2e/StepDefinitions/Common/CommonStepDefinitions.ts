@@ -1,4 +1,5 @@
 import { Given, When, Then } from '#e2e/Fixtures/FixturesBDD.ts';
+import { getCurrentUserData } from '#utils/dataGenerator';
 
 Then('there are no errors in console', ({ basePage }) => {
   basePage.checkForCriticalConsoleErrors();
@@ -31,5 +32,13 @@ Then(
   'logged in as {string} text is {string} at the navigation bar',
   async ({ navigationBar }, username: string, state: string) => {
     await navigationBar.validateLoggedInAsText(username, state);
+  }
+);
+
+Then(
+  'logged in as generated name text is {string} at the navigation bar',
+  async ({ navigationBar }, state: string) => {
+    const userData = getCurrentUserData();
+    await navigationBar.validateLoggedInAsText(userData.fullName, state);
   }
 );

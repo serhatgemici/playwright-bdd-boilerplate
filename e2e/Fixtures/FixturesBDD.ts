@@ -31,5 +31,5 @@ export const test = base.extend<Fixtures>({
   },
 });
 
-export const { Given, When, Then } = createBdd(test);
+export const { Given, When, Then, Before } = createBdd(test);
 export const expect = base.expect;
