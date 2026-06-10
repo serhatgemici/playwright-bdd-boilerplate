@@ -1,0 +1,79 @@
+# GitHub Actions Workflow
+# Builds and pushes Playwright base Docker images (Webkit, Chromium, Chrome)
+# to a container registry. Triggered on schedule or via workflow_dispatch.
+
+name: Build and Push Playwright Base Docker Images
+
+on:
+  workflow_dispatch:  # Replaces Azure's "exclude all branches" trigger (manual-only)
+  schedule:
+    - cron: '0 22 * * *'
+
+env:
+  REGISTRY: ${{ secrets.CONTAINER_REGISTRY_URL }}  # e.g. myregistry.azurecr.io
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ------------------------------------------------------------------
+      # Authenticate with the container registry
+      # ------------------------------------------------------------------
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.CONTAINER_REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # ------------------------------------------------------------------
+      # Webkit
+      # ------------------------------------------------------------------
+      - name: Build Base Docker Image for Webkit
+        run: |
+          docker build \
+            --no-cache \
+            --build-arg baseNodeImageName=${{ vars.BASE_NODE_IMAGE_NAME }} \
+            -f tests/Dockerfile.base.webkit \
+            -t ${{ env.REGISTRY }}/${{ vars.WEBKIT_BASE_IMAGE_DOCKER_REPOSITORY }}:latest \
+            .
+
+      - name: Push Base Docker Image for Webkit
+        if: always()
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ vars.WEBKIT_BASE_IMAGE_DOCKER_REPOSITORY }}:latest
+
+      # ------------------------------------------------------------------
+      # Chromium
+      # ------------------------------------------------------------------
+      - name: Build Base Docker Image for Chromium
+        run: |
+          docker build \
+            --no-cache \
+            --build-arg baseNodeImageName=${{ vars.BASE_NODE_IMAGE_NAME }} \
+            -f tests/Dockerfile.base.chromium \
+            -t ${{ env.REGISTRY }}/${{ vars.CHROMIUM_BASE_IMAGE_DOCKER_REPOSITORY }}:latest \
+            .
+
+      - name: Push Base Docker Image for Chromium
+        if: always()
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ vars.CHROMIUM_BASE_IMAGE_DOCKER_REPOSITORY }}:latest
+
+      # ------------------------------------------------------------------
+      # Chrome
+      # ------------------------------------------------------------------
+      - name: Build Base Docker Image for Chrome
+        run: |
+          docker build \
+            --no-cache \
+            --build-arg baseNodeImageName=${{ vars.BASE_NODE_IMAGE_NAME }} \
+            -f tests/Dockerfile.base.chrome \
+            -t ${{ env.REGISTRY }}/${{ vars.CHROME_BASE_IMAGE_DOCKER_REPOSITORY }}:latest \
+            .
+
+      - name: Push Base Docker Image for Chrome
+        if: always()
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ vars.CHROME_BASE_IMAGE_DOCKER_REPOSITORY }}:latest
