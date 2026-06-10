@@ -1,6 +1,4 @@
 # Use the node image as the base
-# ARG baseNodeImageName
-# FROM ${baseNodeImageName} AS base
 FROM node:20-bookworm AS base
 
 # Set the working directory
@@ -9,8 +7,8 @@ WORKDIR /app
 # Install Playwright
 RUN npm install @playwright/test@1.60.0
 
-# Install only the necessary Playwright dependencies for WebKit
+# Install dependencies for Playwright browsers
 RUN npx playwright install-deps
 
-# Install only the necessary Playwright dependencies for Chrome
+# Install Playwright browsers (chromium, firefox, webkit)
 RUN npx -y playwright install
