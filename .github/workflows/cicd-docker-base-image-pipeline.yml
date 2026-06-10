@@ -17,6 +17,12 @@ jobs:
 
     steps:
       # ------------------------------------------------------------------
+      # Checkout the repository code
+      # ------------------------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------------
       # Authenticate with the container registry
       # ------------------------------------------------------------------
       - name: Login to Docker Registry
@@ -25,6 +31,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
+
       # ------------------------------------------------------------------
       # Build The Base Docker Image
       # ------------------------------------------------------------------
