@@ -1,5 +1,5 @@
 {
-  "name": "intellij-assignment",
+  "name": "playwright-bdd-boilerplate",
   "version": "1.0.0",
   "description": "",
   "keywords": [
@@ -40,7 +40,7 @@
     "format": "prettier --write 'e2e/**/*.{ts,tsx,js,jsx,json,md}'"
   },
   "devDependencies": {
-    "@playwright/test": "^1.59.1",
+    "@playwright/test": "^1.60.0",
     "@types/node": "^25.5.2",
     "allure-playwright": "^3.6.0",
     "cross-env": "^10.1.0",
