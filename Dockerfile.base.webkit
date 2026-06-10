@@ -1,0 +1,15 @@
+# Use the node image as the base
+ARG baseNodeImageName
+FROM ${baseNodeImageName} AS base
+
+# Set the working directory
+WORKDIR /app
+
+# Install Playwright
+RUN npm install @playwright/test@1.51.1
+
+# Install only the necessary Playwright dependencies for WebKit
+RUN npx playwright install-deps webkit
+
+# Install only WebKit (Safari) browser
+RUN npx playwright install webkit

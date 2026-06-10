@@ -1,0 +1,9 @@
+node_modules
+README.md
+qa.code-workspace
+.gitignore
+.eslintrc.json
+LICENSE
+.vscode
+Dockerfile*
+.git
