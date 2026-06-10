@@ -6,7 +6,7 @@ FROM ${baseNodeImageName} AS base
 WORKDIR /app
 
 # Install Playwright
-RUN npm install @playwright/test@1.51.1
+RUN npm install @playwright/test@1.59.1
 
 # Install only the necessary Playwright dependencies for WebKit
 RUN npx playwright install-deps webkit
