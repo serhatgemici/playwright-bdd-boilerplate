@@ -144,3 +144,4 @@ jobs:
       - name: Remove Docker Image
         if: always()
         run: docker rmi -f playwright-test:${{ github.run_id }}
+#
