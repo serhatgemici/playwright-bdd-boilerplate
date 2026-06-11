@@ -57,7 +57,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.3
 
       # Download all 4 shard artifacts into separate folders
       - name: Download Allure Results from All Shards
@@ -69,7 +69,7 @@ jobs:
 
       # Load history from gh-pages for trend graphs
       - name: Load test report history
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.3
         continue-on-error: true
         with:
           ref: gh-pages

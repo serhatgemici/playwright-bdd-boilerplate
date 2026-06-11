@@ -52,7 +52,7 @@ jobs:
 
       - name: Upload Allure Results Artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: allure-results-${{ github.run_id }}-${{ inputs.shard_name }}
           path: allure-results/
