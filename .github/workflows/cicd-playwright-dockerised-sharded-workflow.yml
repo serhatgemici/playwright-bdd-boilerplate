@@ -1,4 +1,4 @@
-name: CI - Playwright Sharded Tests
+name: Run Playwright Tests in Docker (Parallel Shard)
 
 on:
   pull_request:

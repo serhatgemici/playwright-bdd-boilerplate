@@ -1,6 +1,4 @@
-# .github/workflows/ct_functional_pw_parallel_qatest.yml
-
-name: Run Playwright Tests in Docker
+name: playwright-parallel-shard-workflow
 
 on:
   workflow_call:
