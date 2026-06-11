@@ -95,20 +95,31 @@ jobs:
           retention-days: 7
       # ------------------------------------------------------------------
 
+      # # ------------------------------------------------------------------
+      # # Publish Allure Report
+      # # ------------------------------------------------------------------
+      # - name: Publish Allure Report
+      #   if: always()
+      #   uses: allure-framework/allure-action@v0
+      #   with:
+      #     report-directory: ./allure-results
+      #     remote-href: 'https://allure-framework.github.io/allure-action/'
+      #     github-token: ${{ github.token }}
+      #     sections: |
+      #       new
+      #       flaky
+      #       retry
+      # # ------------------------------------------------------------------
+
       # ------------------------------------------------------------------
-      # Publish Allure Report
-      # ------------------------------------------------------------------
-      - name: Publish Allure Report
-        if: always()
-        uses: allure-framework/allure-action@v0
+      - name: Deploy Reports to GitHub pages with History and Retries
+        uses: cybersokari/allure-deployer-action@v1.9.7
         with:
-          report-directory: ./allure-results
-          remote-href: 'https://allure-framework.github.io/allure-action/'
-          github-token: ${{ github.token }}
-          sections: |
-            new
-            flaky
-            retry
+          target: 'github'
+          github_pages_branch: 'gh-pages'
+          allure_results_path: 'allure-results'
+          show_history: 'true'
+          retries: 5
       # ------------------------------------------------------------------
       # ------------------------------------------------------------------
       # Cleanup: Stop and Remove Container, Remove Image
