@@ -151,7 +151,7 @@ export function generateRandomMobileNumber(): string {
  * Generates a random title value accepted by the API
  */
 export function generateRandomTitle(): string {
-  const titles = ['Mr', 'Mrs', 'Miss'];
+  const titles = ['Mr.', 'Mrs.'];
   return titles[Math.floor(Math.random() * titles.length)];
 }
 
