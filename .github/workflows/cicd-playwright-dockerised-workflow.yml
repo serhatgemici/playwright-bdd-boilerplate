@@ -103,35 +103,6 @@ jobs:
           retention-days: 7
       # ------------------------------------------------------------------
 
-      # ------------------------------------------------------------------
-      # # Publish Allure Report
-      # # ------------------------------------------------------------------
-      # - name: Publish Allure Report
-      #   if: always()
-      #   uses: allure-framework/allure-action@v0
-      #   with:
-      #     report-directory: ./allure-results
-      #     remote-href: 'https://serhatgemici.github.io/playwright-bdd-boilerplate/'
-      #     github-token: ${{ github.token }}
-      #     sections: |
-      #       new
-      #       flaky
-      #       retry
-      # # ------------------------------------------------------------------
-
-      # # ------------------------------------------------------------------
-      # # Publish Allure Report
-      # # ------------------------------------------------------------------
-      # - name: Deploy Reports to GitHub pages with History and Retries
-      #   if: always()
-      #   uses: cybersokari/allure-deployer-action@v1.9.7
-      #   with:
-      #     target: 'github'
-      #     allure_results_path: 'allure-results'
-      #     show_history: 'true'
-      #     retries: 5
-      # # ------------------------------------------------------------------
-
       - name: Load test report history
         uses: actions/checkout@v3
         if: always()
@@ -141,12 +112,14 @@ jobs:
           path: gh-pages
 
       - name: Build test report
-        uses: simple-elf/allure-report-action@v1.7
+        uses: simple-elf/allure-report-action@master
         if: always()
+        id: allure-report
         with:
-          gh_pages: gh-pages
-          allure_history: allure-history
           allure_results: build/allure-results
+          gh_pages: gh-pages
+          allure_report: allure-report
+          allure_history: allure-history
 
       - name: Publish test report
         uses: peaceiris/actions-gh-pages@v3
