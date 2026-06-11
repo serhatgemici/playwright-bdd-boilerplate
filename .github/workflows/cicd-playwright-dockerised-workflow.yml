@@ -116,6 +116,16 @@ jobs:
           publish_branch: gh-pages
           publish_dir: allure-history
 
+      - name: Post the link to the report
+        if: always()
+        uses: Sibz/github-status-action@v1
+        with:
+          authToken: ${{ github.token }}
+          context: 'Test report'
+          state: 'success'
+          sha: ${{ github.event.pull_request.head.sha || github.sha }}
+          target_url: serhatgemici.github.io/playwright-bdd-boilerplate/${{ github.run_number }}
+
       # ------------------------------------------------------------------
       # Cleanup: Stop and Remove Container, Remove Image
       # ------------------------------------------------------------------
