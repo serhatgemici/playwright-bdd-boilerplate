@@ -22,6 +22,8 @@ jobs:
       packages: read # Pull base image from GHCR during Docker build
       pull-requests: write
       checks: write
+      pages: write # For publishing Allure report to GitHub Pages
+      id-token: write # For authentication if needed
 
     steps:
       # ------------------------------------------------------------------
@@ -65,7 +67,7 @@ jobs:
       # ------------------------------------------------------------------
 
       # ------------------------------------------------------------------
-      # Run Playwright Tests — replaces the inline script step
+      # Run Playwright Tests in Docker Container
       # ------------------------------------------------------------------
       - name: Run Playwright Tests in Docker Container
         run: |
@@ -103,7 +105,7 @@ jobs:
         uses: allure-framework/allure-action@v0
         with:
           report-directory: ./allure-results
-          remote-href: 'https://allure-framework.github.io/allure-action/'
+          remote-href: 'https://serhatgemici.github.io/playwright-bdd-boilerplate/'
           github-token: ${{ github.token }}
           sections: |
             new
