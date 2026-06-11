@@ -24,6 +24,7 @@ jobs:
       checks: write
       pages: write # For publishing Allure report to GitHub Pages
       id-token: write # For authentication if needed
+      statuses: write # For posting status updates on PRs
 
     steps:
       # ------------------------------------------------------------------
@@ -124,7 +125,7 @@ jobs:
           context: 'Test report'
           state: 'success'
           sha: ${{ github.event.pull_request.head.sha || github.sha }}
-          target_url: serhatgemici.github.io/playwright-bdd-boilerplate/${{ github.run_number }}
+          target_url: https://serhatgemici.github.io/playwright-bdd-boilerplate/${{ github.run_number }}
 
       # ------------------------------------------------------------------
       # Cleanup: Stop and Remove Container, Remove Image
