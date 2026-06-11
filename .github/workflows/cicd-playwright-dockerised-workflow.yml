@@ -113,6 +113,7 @@ jobs:
 
       # ------------------------------------------------------------------
       - name: Deploy Reports to GitHub pages with History and Retries
+        if: always()
         uses: cybersokari/allure-deployer-action@v1.9.7
         with:
           target: 'github'
