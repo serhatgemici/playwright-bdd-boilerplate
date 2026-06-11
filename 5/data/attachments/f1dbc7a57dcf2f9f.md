@@ -1,0 +1,526 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: e2e/Features/@Registration.feature.spec.js >> User Registration >> TC1 - Register a new user successfully
+- Location: .features-gen/e2e/Features/@Registration.feature.spec.js:12:3
+
+# Error details
+
+```
+Error: locator.click: Error: strict mode violation: getByRole('radio', { name: 'Mr' }) resolved to 2 elements:
+    1) <input value="Mr" type="radio" name="title" id="id_gender1"/> aka getByRole('radio', { name: 'Mr.' })
+    2) <input value="Mrs" type="radio" name="title" id="id_gender2"/> aka getByRole('radio', { name: 'Mrs.' })
+
+Call log:
+  - waiting for getByRole('radio', { name: 'Mr' })
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e5]:
+      - link "Website for practice automation" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img "Website for practice automation" [ref=e9]
+      - list [ref=e12]:
+        - listitem [ref=e13]:
+          - link " Home" [ref=e14] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e15]: 
+            - text: Home
+        - listitem [ref=e16]:
+          - link " Products" [ref=e17] [cursor=pointer]:
+            - /url: /products
+            - generic [ref=e18]: 
+            - text: Products
+        - listitem [ref=e19]:
+          - link " Cart" [ref=e20] [cursor=pointer]:
+            - /url: /view_cart
+            - generic [ref=e21]: 
+            - text: Cart
+        - listitem [ref=e22]:
+          - link " Signup / Login" [ref=e23] [cursor=pointer]:
+            - /url: /login
+            - generic [ref=e24]: 
+            - text: Signup / Login
+        - listitem [ref=e25]:
+          - link " Test Cases" [ref=e26] [cursor=pointer]:
+            - /url: /test_cases
+            - generic [ref=e27]: 
+            - text: Test Cases
+        - listitem [ref=e28]:
+          - link " API Testing" [ref=e29] [cursor=pointer]:
+            - /url: /api_list
+            - generic [ref=e30]: 
+            - text: API Testing
+        - listitem [ref=e31]:
+          - link " Video Tutorials" [ref=e32] [cursor=pointer]:
+            - /url: https://www.youtube.com/c/AutomationExercise
+            - generic [ref=e33]: 
+            - text: Video Tutorials
+        - listitem [ref=e34]:
+          - link " Contact us" [ref=e35] [cursor=pointer]:
+            - /url: /contact_us
+            - generic [ref=e36]: 
+            - text: Contact us
+  - generic [ref=e38]:
+    - generic [ref=e41]:
+      - heading "Enter Account Information" [level=2] [ref=e42]
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]: Title
+          - generic [ref=e47]:
+            - radio "Mr." [ref=e49]
+            - text: Mr.
+          - generic [ref=e51]:
+            - radio "Mrs." [ref=e53]
+            - text: Mrs.
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - text: Name
+            - superscript [ref=e56]: "*"
+          - textbox "Name *" [ref=e57]: Sarah
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - text: Email
+            - superscript [ref=e60]: "*"
+          - textbox "Email *" [disabled] [ref=e61]: testuser_1781213173284_1981@example.com
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - text: Password
+            - superscript [ref=e64]: "*"
+          - textbox "Password *" [ref=e65]
+        - generic [ref=e66]:
+          - generic [ref=e67]: Date of Birth
+          - generic [ref=e68]:
+            - combobox [ref=e71]:
+              - option "Day" [selected]
+              - option "1"
+              - option "2"
+              - option "3"
+              - option "4"
+              - option "5"
+              - option "6"
+              - option "7"
+              - option "8"
+              - option "9"
+              - option "10"
+              - option "11"
+              - option "12"
+              - option "13"
+              - option "14"
+              - option "15"
+              - option "16"
+              - option "17"
+              - option "18"
+              - option "19"
+              - option "20"
+              - option "21"
+              - option "22"
+              - option "23"
+              - option "24"
+              - option "25"
+              - option "26"
+              - option "27"
+              - option "28"
+              - option "29"
+              - option "30"
+              - option "31"
+            - combobox [ref=e74]:
+              - option "Month" [selected]
+              - option "January"
+              - option "February"
+              - option "March"
+              - option "April"
+              - option "May"
+              - option "June"
+              - option "July"
+              - option "August"
+              - option "September"
+              - option "October"
+              - option "November"
+              - option "December"
+            - combobox [ref=e77]:
+              - option "Year" [selected]
+              - option "2021"
+              - option "2020"
+              - option "2019"
+              - option "2018"
+              - option "2017"
+              - option "2016"
+              - option "2015"
+              - option "2014"
+              - option "2013"
+              - option "2012"
+              - option "2011"
+              - option "2010"
+              - option "2009"
+              - option "2008"
+              - option "2007"
+              - option "2006"
+              - option "2005"
+              - option "2004"
+              - option "2003"
+              - option "2002"
+              - option "2001"
+              - option "2000"
+              - option "1999"
+              - option "1998"
+              - option "1997"
+              - option "1996"
+              - option "1995"
+              - option "1994"
+              - option "1993"
+              - option "1992"
+              - option "1991"
+              - option "1990"
+              - option "1989"
+              - option "1988"
+              - option "1987"
+              - option "1986"
+              - option "1985"
+              - option "1984"
+              - option "1983"
+              - option "1982"
+              - option "1981"
+              - option "1980"
+              - option "1979"
+              - option "1978"
+              - option "1977"
+              - option "1976"
+              - option "1975"
+              - option "1974"
+              - option "1973"
+              - option "1972"
+              - option "1971"
+              - option "1970"
+              - option "1969"
+              - option "1968"
+              - option "1967"
+              - option "1966"
+              - option "1965"
+              - option "1964"
+              - option "1963"
+              - option "1962"
+              - option "1961"
+              - option "1960"
+              - option "1959"
+              - option "1958"
+              - option "1957"
+              - option "1956"
+              - option "1955"
+              - option "1954"
+              - option "1953"
+              - option "1952"
+              - option "1951"
+              - option "1950"
+              - option "1949"
+              - option "1948"
+              - option "1947"
+              - option "1946"
+              - option "1945"
+              - option "1944"
+              - option "1943"
+              - option "1942"
+              - option "1941"
+              - option "1940"
+              - option "1939"
+              - option "1938"
+              - option "1937"
+              - option "1936"
+              - option "1935"
+              - option "1934"
+              - option "1933"
+              - option "1932"
+              - option "1931"
+              - option "1930"
+              - option "1929"
+              - option "1928"
+              - option "1927"
+              - option "1926"
+              - option "1925"
+              - option "1924"
+              - option "1923"
+              - option "1922"
+              - option "1921"
+              - option "1920"
+              - option "1919"
+              - option "1918"
+              - option "1917"
+              - option "1916"
+              - option "1915"
+              - option "1914"
+              - option "1913"
+              - option "1912"
+              - option "1911"
+              - option "1910"
+              - option "1909"
+              - option "1908"
+              - option "1907"
+              - option "1906"
+              - option "1905"
+              - option "1904"
+              - option "1903"
+              - option "1902"
+              - option "1901"
+              - option "1900"
+        - generic [ref=e78]:
+          - checkbox "Sign up for our newsletter!" [ref=e79]
+          - text: Sign up for our newsletter!
+        - generic [ref=e80]:
+          - checkbox "Receive special offers from our partners!" [ref=e81]
+          - text: Receive special offers from our partners!
+        - heading "Address Information" [level=2] [ref=e82]
+        - paragraph [ref=e83]:
+          - generic [ref=e84]:
+            - text: First name
+            - superscript [ref=e85]: "*"
+          - textbox "First name *" [ref=e86]
+        - paragraph [ref=e87]:
+          - generic [ref=e88]:
+            - text: Last name
+            - superscript [ref=e89]: "*"
+          - textbox "Last name *" [ref=e90]
+        - paragraph [ref=e91]:
+          - generic [ref=e92]: Company
+          - textbox "Company" [ref=e93]
+        - paragraph [ref=e94]:
+          - generic [ref=e95]:
+            - text: Address
+            - superscript [ref=e96]: "*"
+            - text: (Street address, P.O. Box, Company name, etc.)
+          - textbox "Address * (Street address, P.O. Box, Company name, etc.)" [ref=e97]
+        - paragraph [ref=e98]:
+          - generic [ref=e99]: Address 2
+          - textbox "Address 2" [ref=e100]
+        - paragraph [ref=e101]:
+          - generic [ref=e102]:
+            - text: Country
+            - superscript [ref=e103]: "*"
+          - combobox "Country *" [ref=e104]:
+            - option "India" [selected]
+            - option "United States"
+            - option "Canada"
+            - option "Australia"
+            - option "Israel"
+            - option "New Zealand"
+            - option "Singapore"
+        - paragraph [ref=e105]:
+          - generic [ref=e106]:
+            - text: State
+            - superscript [ref=e107]: "*"
+          - textbox "State *" [ref=e108]
+        - paragraph [ref=e109]:
+          - generic [ref=e110]:
+            - text: City
+            - superscript [ref=e111]: "*"
+          - textbox "City * Zipcode *" [ref=e112]
+        - paragraph [ref=e113]:
+          - generic [ref=e114]:
+            - text: Zipcode
+            - superscript [ref=e115]: "*"
+          - textbox [ref=e116]
+        - paragraph [ref=e117]:
+          - generic [ref=e118]:
+            - text: Mobile Number
+            - superscript [ref=e119]: "*"
+          - textbox "Mobile Number *" [ref=e120]
+        - button "Create Account" [ref=e121] [cursor=pointer]
+    - insertion [ref=e123]:
+      - iframe [ref=e125]:
+        
+  - contentinfo [ref=e126]:
+    - generic [ref=e131]:
+      - heading "Subscription" [level=2] [ref=e132]
+      - generic [ref=e133]:
+        - textbox "Your email address" [ref=e134]
+        - button "" [ref=e135] [cursor=pointer]:
+          - generic [ref=e136]: 
+        - paragraph [ref=e137]:
+          - text: Get the most recent updates from
+          - text: our site and be updated your self...
+    - paragraph [ref=e141]: Copyright © 2021 All rights reserved
+  - text: 
+```
+
+# Test source
+
+```ts
+  1   | import { Page, Locator } from '@playwright/test';
+  2   | 
+  3   | import BasePage from '#e2e/Pages/BasePage';
+  4   | import { generateRandomUserData } from '#utils/dataGenerator';
+  5   | import { type AccountData } from '#utils/types';
+  6   | 
+  7   | const CREATE_ACCOUNT_SUCCESS_CODE = 201;
+  8   | const CREATE_ACCOUNT_SUCCESS_MESSAGE = 'User created!';
+  9   | 
+  10  | class SignUpPage {
+  11  |   page: Page;
+  12  |   // External page objects properties declarations
+  13  |   basePage: BasePage;
+  14  |   // Locator properties declarations
+  15  |   readonly titleRadioButtons: (title: string) => Locator;
+  16  |   readonly nameInput: Locator;
+  17  |   readonly emailInput: Locator;
+  18  |   readonly passwordInput: Locator;
+  19  |   readonly dayOfBirthSelect: Locator;
+  20  |   readonly monthOfBirthSelect: Locator;
+  21  |   readonly yearOfBirthSelect: Locator;
+  22  |   readonly newsletterCheckbox: Locator;
+  23  |   readonly specialOffersCheckbox: Locator;
+  24  | 
+  25  |   readonly firstNameInput: Locator;
+  26  |   readonly lastNameInput: Locator;
+  27  |   readonly companyInput: Locator;
+  28  |   readonly addressInput: Locator;
+  29  |   readonly address2Input: Locator;
+  30  |   readonly countrySelect: Locator;
+  31  |   readonly stateInput: Locator;
+  32  |   readonly cityInput: Locator;
+  33  |   readonly zipcodeInput: Locator;
+  34  |   readonly mobileNumberInput: Locator;
+  35  | 
+  36  |   constructor(page: Page) {
+  37  |     this.page = page;
+  38  | 
+  39  |     // External page objects initializations
+  40  |     this.basePage = new BasePage(page);
+  41  | 
+  42  |     // Locator properties initializations & assignments
+  43  |     this.titleRadioButtons = (title: string) => page.getByRole('radio', { name: title });
+  44  |     this.nameInput = page.getByTestId('name');
+  45  |     this.emailInput = page.getByTestId('email');
+  46  |     this.passwordInput = page.getByTestId('password');
+  47  |     this.dayOfBirthSelect = page.getByTestId('days');
+  48  |     this.monthOfBirthSelect = page.getByTestId('months');
+  49  |     this.yearOfBirthSelect = page.getByTestId('years');
+  50  |     this.newsletterCheckbox = page.locator('#newsletter');
+  51  |     this.specialOffersCheckbox = page.locator('#optin');
+  52  | 
+  53  |     this.firstNameInput = page.getByTestId('first_name');
+  54  |     this.lastNameInput = page.getByTestId('last_name');
+  55  |     this.companyInput = page.getByTestId('company');
+  56  |     this.addressInput = page.getByTestId('address');
+  57  |     this.address2Input = page.getByTestId('address2');
+  58  |     this.countrySelect = page.getByTestId('country');
+  59  |     this.stateInput = page.getByTestId('state');
+  60  |     this.cityInput = page.getByTestId('city');
+  61  |     this.zipcodeInput = page.getByTestId('zipcode');
+  62  |     this.mobileNumberInput = page.getByTestId('mobile_number');
+  63  |   }
+  64  | 
+  65  |   // METHODS
+  66  |   async selectTitleAs(title: string): Promise<void> {
+  67  |     const titleOption = this.titleRadioButtons(title);
+> 68  |     await titleOption.click();
+      |                       ^ Error: locator.click: Error: strict mode violation: getByRole('radio', { name: 'Mr' }) resolved to 2 elements:
+  69  |   }
+  70  | 
+  71  |   async enterName(name: string): Promise<void> {
+  72  |     await this.nameInput.fill(name);
+  73  |   }
+  74  | 
+  75  |   async enterEmail(email: string): Promise<void> {
+  76  |     await this.emailInput.fill(email);
+  77  |   }
+  78  | 
+  79  |   async enterPassword(password: string): Promise<void> {
+  80  |     await this.passwordInput.fill(password);
+  81  |   }
+  82  | 
+  83  |   async selectDateOfBirth(day: string, month: string, year: string): Promise<void> {
+  84  |     await this.dayOfBirthSelect.selectOption(day);
+  85  |     await this.monthOfBirthSelect.selectOption(month);
+  86  |     await this.yearOfBirthSelect.selectOption(year);
+  87  |   }
+  88  | 
+  89  |   async selectDateOfBirthAs(value: string): Promise<void> {
+  90  |     await this.selectDateOfBirth(value, value, value);
+  91  |   }
+  92  | 
+  93  |   async toggleNewsletterCheckbox(): Promise<void> {
+  94  |     await this.newsletterCheckbox.click();
+  95  |   }
+  96  | 
+  97  |   async toggleSpecialOffersCheckbox(): Promise<void> {
+  98  |     await this.specialOffersCheckbox.click();
+  99  |   }
+  100 | 
+  101 |   async toggleCheckbox(name: string): Promise<void> {
+  102 |     const checkboxMap: Record<string, () => Promise<void>> = {
+  103 |       newsletter: () => this.toggleNewsletterCheckbox(),
+  104 |       'special offers': () => this.toggleSpecialOffersCheckbox(),
+  105 |     };
+  106 |     await checkboxMap[name]();
+  107 |   }
+  108 | 
+  109 |   async fillFirstName(firstName: string): Promise<void> {
+  110 |     await this.firstNameInput.fill(firstName);
+  111 |   }
+  112 | 
+  113 |   async fillLastName(lastName: string): Promise<void> {
+  114 |     await this.lastNameInput.fill(lastName);
+  115 |   }
+  116 | 
+  117 |   async fillZipcode(zipcode: string): Promise<void> {
+  118 |     await this.zipcodeInput.fill(zipcode);
+  119 |   }
+  120 | 
+  121 |   async fillMobileNumber(mobileNumber: string): Promise<void> {
+  122 |     await this.mobileNumberInput.fill(mobileNumber);
+  123 |   }
+  124 | 
+  125 |   async fillCompany(company: string): Promise<void> {
+  126 |     await this.companyInput.fill(company);
+  127 |   }
+  128 | 
+  129 |   async fillAddress(address: string): Promise<void> {
+  130 |     await this.addressInput.fill(address);
+  131 |   }
+  132 | 
+  133 |   async fillAddress2(address2: string): Promise<void> {
+  134 |     await this.address2Input.fill(address2);
+  135 |   }
+  136 | 
+  137 |   async selectCountry(country: string): Promise<void> {
+  138 |     await this.countrySelect.selectOption(country);
+  139 |   }
+  140 | 
+  141 |   async fillState(state: string): Promise<void> {
+  142 |     await this.stateInput.fill(state);
+  143 |   }
+  144 | 
+  145 |   async fillCity(city: string): Promise<void> {
+  146 |     await this.cityInput.fill(city);
+  147 |   }
+  148 | 
+  149 |   async createAccountViaApi(payload: AccountData): Promise<void> {
+  150 |     const response = await this.page.request.post(
+  151 |       'https://automationexercise.com/api/createAccount',
+  152 |       {
+  153 |         form: payload,
+  154 |       }
+  155 |     );
+  156 | 
+  157 |     const responseBody = (await response.json()) as {
+  158 |       responseCode?: number;
+  159 |       message?: string;
+  160 |     };
+  161 | 
+  162 |     if (!response.ok()) {
+  163 |       throw new Error(
+  164 |         `createAccount API call failed with HTTP ${response.status()}: ${JSON.stringify(responseBody)}`
+  165 |       );
+  166 |     }
+  167 | 
+  168 |     // Endpoint may return HTTP 200 while exposing API-level code in response body.
+```
