@@ -5,19 +5,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      shard1_run_script:
-        description: 'npm script to run for Shard 1 (e.g. test:dev:shard1)'
-        required: true
-      shard2_run_script:
-        description: 'npm script to run for Shard 2 (e.g. test:dev:shard2)'
-        required: true
-      shard3_run_script:
-        description: 'npm script to run for Shard 3 (e.g. test:dev:shard3)'
-        required: true
-      shard4_run_script:
-        description: 'npm script to run for Shard 4 (e.g. test:dev:shard4)'
-        required: true
 
 jobs:
   # ------------------------------------------------------------------
@@ -29,13 +16,13 @@ jobs:
       matrix:
         include:
           - shardName: Shard1
-            run_script: ${{ github.event.inputs.shard1_run_script }}
+            run_script: ${{ vars.SHARD1_RUN_SCRIPT  }}
           - shardName: Shard2
-            run_script: ${{ github.event.inputs.shard2_run_script }}
+            run_script: ${{ vars.SHARD2_RUN_SCRIPT  }}
           - shardName: Shard3
-            run_script: ${{ github.event.inputs.shard3_run_script }}
+            run_script: ${{ vars.SHARD3_RUN_SCRIPT  }}
           - shardName: Shard4
-            run_script: ${{ github.event.inputs.shard4_run_script }}
+            run_script: ${{ vars.SHARD4_RUN_SCRIPT  }}
     uses: ./.github/workflows/cicd-playwright-parallel-shard-workflow.yml
     with:
       run_script: ${{ matrix.run_script }}
