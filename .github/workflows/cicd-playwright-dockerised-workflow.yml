@@ -20,6 +20,8 @@ jobs:
     permissions:
       contents: read # Allows actions/checkout to clone the private repo
       packages: read # Pull base image from GHCR during Docker build
+      pull-requests: write
+      checks: write
 
     steps:
       # ------------------------------------------------------------------
