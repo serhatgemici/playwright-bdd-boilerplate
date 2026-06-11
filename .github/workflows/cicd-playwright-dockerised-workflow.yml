@@ -18,7 +18,8 @@ jobs:
   test-in-docker:
     runs-on: ubuntu-latest
     permissions:
-      contents: read # Allows actions/checkout to clone the private repo
+      contents: write
+      actions: write
       packages: read # Pull base image from GHCR during Docker build
       pull-requests: write
       checks: write
@@ -98,20 +99,33 @@ jobs:
       # ------------------------------------------------------------------
 
       # ------------------------------------------------------------------
+      # # Publish Allure Report
+      # # ------------------------------------------------------------------
+      # - name: Publish Allure Report
+      #   if: always()
+      #   uses: allure-framework/allure-action@v0
+      #   with:
+      #     report-directory: ./allure-results
+      #     remote-href: 'https://serhatgemici.github.io/playwright-bdd-boilerplate/'
+      #     github-token: ${{ github.token }}
+      #     sections: |
+      #       new
+      #       flaky
+      #       retry
+      # # ------------------------------------------------------------------
+
+      # ------------------------------------------------------------------
       # Publish Allure Report
       # ------------------------------------------------------------------
-      - name: Publish Allure Report
-        if: always()
-        uses: allure-framework/allure-action@v0
+      - name: Deploy Reports to GitHub pages with History and Retries
+        uses: cybersokari/allure-deployer-action@v1.9.7
         with:
-          report-directory: ./allure-results
-          remote-href: 'https://serhatgemici.github.io/playwright-bdd-boilerplate/'
-          github-token: ${{ github.token }}
-          sections: |
-            new
-            flaky
-            retry
+          target: 'github'
+          allure_results_path: 'allure-results'
+          show_history: 'true'
+          retries: 5
       # ------------------------------------------------------------------
+
       # ------------------------------------------------------------------
       # Cleanup: Stop and Remove Container, Remove Image
       # ------------------------------------------------------------------
