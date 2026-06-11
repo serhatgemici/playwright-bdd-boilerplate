@@ -12,6 +12,9 @@ on:
         description: 'npm script to run (e.g. test:dev)'
         required: true
         default: 'test:dev'
+  pull_request:
+    branches:
+      - main
 
 jobs:
   test-in-docker:
@@ -67,7 +70,7 @@ jobs:
           docker run --name ${{ github.run_id }} \
             -e CI=true \
             playwright-test:${{ github.run_id }} \
-            npm run ${{ inputs.run_script }}
+            npm run ${{ inputs.run_script || 'test:dev' }}   # fallback for PR triggers
       # ------------------------------------------------------------------
       # ------------------------------------------------------------------
       # Copy Test Reports from Container to Host
