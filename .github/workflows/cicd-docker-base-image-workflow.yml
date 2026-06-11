@@ -21,7 +21,7 @@ jobs:
       # Checkout the repository code
       # ------------------------------------------------------------------
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.3
 
       # ------------------------------------------------------------------
       # Authenticate with the container registry
