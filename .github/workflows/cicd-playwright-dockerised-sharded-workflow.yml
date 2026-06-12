@@ -27,6 +27,7 @@ jobs:
     outputs:
       image_tag: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      shard_count: ${{ steps.set-matrix.outputs.shard_count }}
     steps:
       - uses: actions/checkout@v4
 
@@ -75,6 +76,7 @@ jobs:
           SHARD_COUNT=$(( SHARD_COUNT > 4 ? 4 : SHARD_COUNT ))
 
           echo "SHARD_COUNT=$SHARD_COUNT"
+          echo "shard_count=$SHARD_COUNT" >> "$GITHUB_OUTPUT"
 
           if [ "$SHARD_COUNT" -eq 1 ]; then
             MATRIX=$(jq -cn --arg env "$ENVIRONMENT" \
@@ -93,13 +95,43 @@ jobs:
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
       - name: Push Docker Image to GHCR
+        if: ${{ fromJson(needs.build-image.outputs.shard_count) > 1 }}
         run: docker push ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
 
+      - name: Run Tests Directly (Single Shard)
+        if: ${{ fromJson(needs.build-image.outputs.shard_count) == 1 }}
+        env:
+          IMAGE: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
+          ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+        run: |
+          docker run --name single-shard \
+            -e CI=true \
+            "$IMAGE" \
+            npm run test:$ENVIRONMENT
+
+      - name: Copy Test Reports (Single Shard)
+        if: ${{ fromJson(needs.build-image.outputs.shard_count) == 1 && always() }}
+        run: |
+          docker cp single-shard:/app/allure-results/ ./allure-results/
+
+      - name: Upload Allure Results (Single Shard)
+        if: ${{ fromJson(needs.build-image.outputs.shard_count) == 1 && always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ github.run_id }}-Shard1
+          path: allure-results/
+          retention-days: 7
+
+      - name: Cleanup Single Shard Container
+        if: ${{ fromJson(needs.build-image.outputs.shard_count) == 1 && always() }}
+        run: docker rm single-shard
+
   # ------------------------------------------------------------------
-  # 2. Run parallel shards (count determined dynamically)
+  # 2. Run parallel shards (only if more than 1 shard) using reusable workflow
   # ------------------------------------------------------------------
   run-shard-tests:
     needs: [build-image]
+    if: ${{ fromJson(needs.build-image.outputs.shard_count) > 1 }}
     strategy:
       fail-fast: false
       matrix:
@@ -115,7 +147,7 @@ jobs:
   # ------------------------------------------------------------------
   publish-report:
     runs-on: ubuntu-latest
-    needs: run-shard-tests
+    needs: [build-image, run-shard-tests]
     if: always()
     permissions:
       contents: write
@@ -165,6 +197,6 @@ jobs:
         with:
           authToken: ${{ github.token }}
           context: 'Allure Test Report'
-          state: ${{ needs.run-shard-tests.result == 'success' && 'success' || 'failure' }}
+          state: ${{ needs.run-shard-tests.result == 'success' || needs.build-image.result == 'success' && 'success' || 'failure' }}
           sha: ${{ github.event.pull_request.head.sha || github.sha }}
           target_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
