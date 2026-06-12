@@ -9,7 +9,7 @@ on:
       tests_per_shard:
         description: 'Max number of tests per shard'
         required: false
-        default: '40'
+        default: '10'
       environment:
         description: 'Test environment (dev, stage, prod)'
         required: false
@@ -58,7 +58,7 @@ jobs:
       - name: Count Tests & Generate Matrix
         id: set-matrix
         env:
-          TESTS_PER_SHARD: ${{ github.event.inputs.tests_per_shard || '40' }}
+          TESTS_PER_SHARD: ${{ github.event.inputs.tests_per_shard || '10' }}
           ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
           IMAGE: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
         run: |
@@ -146,7 +146,7 @@ jobs:
   # ------------------------------------------------------------------
   # 2. Run parallel shards (only if more than 1 shard) using reusable workflow
   # ------------------------------------------------------------------
-  dynamic-paralellization:
+  dynamic-parallelization:
     needs: [build-and-dispatch-tests]
     if: needs.build-and-dispatch-tests.outputs.shard_count != '1'
     strategy:
@@ -164,7 +164,7 @@ jobs:
   # ------------------------------------------------------------------
   publish-report:
     runs-on: ubuntu-latest
-    needs: [build-and-dispatch-tests, dynamic-paralellization]
+    needs: [build-and-dispatch-tests, dynamic-parallelization]
     if: always()
     permissions:
       contents: write
@@ -214,6 +214,6 @@ jobs:
         with:
           authToken: ${{ github.token }}
           context: 'Allure Test Report'
-          state: ${{ needs.dynamic-paralellization.result == 'success' || needs.build-and-dispatch-tests.result == 'success' && 'success' || 'failure' }}
+          state: ${{ (needs.dynamic-parallelization.result == 'success' || needs.build-and-dispatch-tests.result == 'success') && 'success' || 'failure' }}
           sha: ${{ github.event.pull_request.head.sha || github.sha }}
           target_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
