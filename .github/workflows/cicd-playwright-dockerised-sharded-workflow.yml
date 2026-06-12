@@ -32,6 +32,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
     steps:
       - uses: actions/checkout@v6.0.3
 
@@ -49,7 +51,7 @@ jobs:
         with:
           context: .
           push: true # pushes to GHCR so it can be pulled in parallel jobs
-          tags: ghcr.io/${{ github.repository_owner }}/playwright-test:${{ github.run_id }}
+          tags: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
           cache-from: type=gha,scope=${{ github.ref_name }}-playwright
           cache-to: type=gha,mode=max,scope=${{ github.ref_name }}-playwright
   # ------------------------------------------------------------------
@@ -73,7 +75,6 @@ jobs:
     with:
       run_script: ${{ matrix.run_script }}
       shard_name: ${{ matrix.shardName }}
-      caller_run_id: ${{ github.run_id }}
     secrets: inherit
 
   # ------------------------------------------------------------------
