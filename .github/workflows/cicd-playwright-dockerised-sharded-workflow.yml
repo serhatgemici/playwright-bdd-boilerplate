@@ -58,10 +58,23 @@ jobs:
           ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
           IMAGE: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
         run: |
+          # Map environment to Playwright project name
+          case "$ENVIRONMENT" in
+            dev)   PROJECT="Develop"    ;;
+            stage) PROJECT="Stage"      ;;
+            prod)  PROJECT="Production" ;;
+            *)
+              echo "ERROR: Unknown environment '$ENVIRONMENT'. Expected: dev, stage, prod"
+              exit 1
+              ;;
+          esac
+
+          echo "PROJECT=$PROJECT"
+
           TOTAL_TESTS=$(docker run --rm \
             -e CI=true \
             "$IMAGE" \
-            sh -c "npx bddgen > /dev/null 2>&1 && npx playwright test --list --project=Develop 2>/dev/null" \
+            sh -c "npx bddgen > /dev/null 2>&1 && npx playwright test --list --project=$PROJECT 2>/dev/null" \
           | grep '^Total:' | awk '{print $2}')
 
           echo "TOTAL_TESTS=$TOTAL_TESTS"
