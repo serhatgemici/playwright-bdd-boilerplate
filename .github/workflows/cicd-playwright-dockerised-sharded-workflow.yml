@@ -16,6 +16,9 @@ jobs:
   # ------------------------------------------------------------------
   build-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     outputs:
       image_tag: ${{ steps.meta.outputs.tags }}
     steps:
