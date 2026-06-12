@@ -41,6 +41,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.1.0
 
+      - name: Pre-pull & Cache Base Image
+        run: |
+          docker pull ghcr.io/serhatgemici/playwright-test:latest
+
       - name: Build & Load Docker Image
         uses: docker/build-push-action@v7.2.0
         with:
@@ -48,8 +52,10 @@ jobs:
           push: false
           load: true
           tags: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
-          cache-from: type=gha,scope=${{ github.ref_name }}-playwright
-          cache-to: type=gha,mode=max,scope=${{ github.ref_name }}-playwright
+          cache-from: |
+            type=gha,scope=playwright-${{ hashFiles('package-lock.json') }}
+            type=gha,scope=playwright-base
+          cache-to: type=gha,mode=max,scope=playwright-${{ hashFiles('package-lock.json') }}
 
       - name: Count Tests & Generate Matrix
         id: set-matrix
