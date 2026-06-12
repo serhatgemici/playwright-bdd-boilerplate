@@ -64,13 +64,13 @@ jobs:
       matrix:
         include:
           - shardName: Shard1
-            run_script: ${{ github.event.inputs.shard1_run_script }}
+            run_script: ${{ github.event.inputs.shard1_run_script  || 'test:dev:shard1' }}
           - shardName: Shard2
-            run_script: ${{ github.event.inputs.shard2_run_script }}
+            run_script: ${{ github.event.inputs.shard2_run_script  || 'test:dev:shard2' }}
           - shardName: Shard3
-            run_script: ${{ github.event.inputs.shard3_run_script }}
+            run_script: ${{ github.event.inputs.shard3_run_script  || 'test:dev:shard3' }}
           - shardName: Shard4
-            run_script: ${{ github.event.inputs.shard4_run_script }}
+            run_script: ${{ github.event.inputs.shard4_run_script  || 'test:dev:shard4' }}
     uses: ./.github/workflows/cicd-playwright-parallel-shard-workflow.yml
     with:
       run_script: ${{ matrix.run_script }}
