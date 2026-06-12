@@ -129,7 +129,7 @@ jobs:
   # ------------------------------------------------------------------
   # 2. Run parallel shards (only if more than 1 shard) using reusable workflow
   # ------------------------------------------------------------------
-  run-shard-tests:
+  dynamic-paralellization:
     needs: [build-and-dispatch]
     if: needs.build-and-dispatch.outputs.shard_count != '1'
     strategy:
@@ -147,7 +147,7 @@ jobs:
   # ------------------------------------------------------------------
   publish-report:
     runs-on: ubuntu-latest
-    needs: [build-and-dispatch, run-shard-tests]
+    needs: [build-and-dispatch, dynamic-paralellization]
     if: always()
     permissions:
       contents: write
@@ -197,6 +197,6 @@ jobs:
         with:
           authToken: ${{ github.token }}
           context: 'Allure Test Report'
-          state: ${{ needs.run-shard-tests.result == 'success' || needs.build-and-dispatch.result == 'success' && 'success' || 'failure' }}
+          state: ${{ needs.dynamic-paralellization.result == 'success' || needs.build-and-dispatch.result == 'success' && 'success' || 'failure' }}
           sha: ${{ github.event.pull_request.head.sha || github.sha }}
           target_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
