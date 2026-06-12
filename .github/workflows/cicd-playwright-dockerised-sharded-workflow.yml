@@ -47,9 +47,9 @@ jobs:
           cache-from: type=gha,scope=${{ github.ref_name }}-playwright
           cache-to: type=gha,mode=max,scope=${{ github.ref_name }}-playwright
 
-      # ------------------------------------------------------------------
-      # 2. Count tests and compute dynamic shard matrix
-      # ------------------------------------------------------------------
+  # ------------------------------------------------------------------
+  # 2. Count tests and compute dynamic shard matrix
+  # ------------------------------------------------------------------
   compute-shards:
     needs: build-image
     runs-on: ubuntu-latest
@@ -76,35 +76,28 @@ jobs:
           ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
           IMAGE: ${{ needs.build-image.outputs.image_tag }}
         run: |
-          # 1. Run bddgen inside container, then count test( lines in .features-gen/
           TOTAL_TESTS=$(docker run --rm \
             -e CI=true \
             "$IMAGE" \
-            sh -c "npx bddgen > /dev/null 2>&1 && grep -r '^test(' .features-gen/ --include='*.js' | wc -l" \
+            sh -c "cd /app && npx bddgen > /dev/null 2>&1 && (grep -r '^test(' /app/.features-gen/ --include='*.js' || true) | wc -l" \
           | tr -d ' \n')
 
           echo "TOTAL_TESTS=$TOTAL_TESTS"
 
-          # 2. Guard: if count is 0 or empty, fail loudly
           if [ -z "$TOTAL_TESTS" ] || [ "$TOTAL_TESTS" -eq 0 ]; then
             echo "ERROR: Could not determine test count. Got: '$TOTAL_TESTS'"
             exit 1
           fi
 
-          # 3. Compute shard count — ceiling division
           SHARD_COUNT=$(( (TOTAL_TESTS + TESTS_PER_SHARD - 1) / TESTS_PER_SHARD ))
           SHARD_COUNT=$(( SHARD_COUNT < 1 ? 1 : SHARD_COUNT ))
-          SHARD_COUNT=$(( SHARD_COUNT > 4 ? 4 : SHARD_COUNT ))  # cap at 4 (package.json has shard1-4)
+          SHARD_COUNT=$(( SHARD_COUNT > 4 ? 4 : SHARD_COUNT ))
 
           echo "SHARD_COUNT=$SHARD_COUNT"
 
-          # 4. Generate matrix JSON
-          # If only 1 shard → use base script (test:dev), NOT test:dev:shard1
-          # If multiple shards → use test:dev:shard1, test:dev:shard2, etc.
           if [ "$SHARD_COUNT" -eq 1 ]; then
             MATRIX=$(jq -cn --arg env "$ENVIRONMENT" \
-              '[{"shardName": "Shard1", "run_script": ("test:" + $env)}]'
-            )
+              '[{"shardName": "Shard1", "run_script": ("test:" + $env)}]')
           else
             MATRIX=$(jq -cn \
               --argjson count "$SHARD_COUNT" \
@@ -112,8 +105,7 @@ jobs:
               '[range(1; $count + 1) | {
                 "shardName": ("Shard" + (. | tostring)),
                 "run_script": ("test:" + $env + ":shard" + (. | tostring))
-              }]'
-            )
+              }]')
           fi
 
           echo "Matrix: $MATRIX"
