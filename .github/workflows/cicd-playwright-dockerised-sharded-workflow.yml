@@ -6,48 +6,49 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      shard1_run_script:
-        description: 'npm script to run for Shard 1'
+      run_script:
         required: true
-        default: 'test:dev:shard1'
-      shard2_run_script:
-        description: 'npm script to run for Shard 2'
-        required: true
-        default: 'test:dev:shard2'
-      shard3_run_script:
-        description: 'npm script to run for Shard 3'
-        required: true
-        default: 'test:dev:shard3'
-      shard4_run_script:
-        description: 'npm script to run for Shard 4'
-        required: true
-        default: 'test:dev:shard4'
+        default: test:dev
 
 jobs:
   # ------------------------------------------------------------------
-  # 1. Run 4 parallel shards
+  # 1. Build Docker image once for all shards
+  # ------------------------------------------------------------------
+  build-image:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v6.0.3
+      - uses: docker/login-action@v4.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true # pushes to GHCR so it can be pulled in parallel jobs
+          tags: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  # ------------------------------------------------------------------
+  # 2. Run 4 parallel shards
   # ------------------------------------------------------------------
   run-shard-tests:
+    needs: build-image
     strategy:
       fail-fast: false # keep other shards running if one fails
       matrix:
-        include:
-          - shardName: Shard1
-            run_script: ${{ github.event.inputs.shard1_run_script }}
-          - shardName: Shard2
-            run_script: ${{ github.event.inputs.shard2_run_script }}
-          - shardName: Shard3
-            run_script: ${{ github.event.inputs.shard3_run_script }}
-          - shardName: Shard4
-            run_script: ${{ github.event.inputs.shard4_run_script }}
+        shard: [1, 2, 3, 4]
     uses: ./.github/workflows/cicd-playwright-parallel-shard-workflow.yml
     with:
-      run_script: ${{ matrix.run_script }}
-      shard_name: ${{ matrix.shardName }}
+      run_script: ${{ github.event.inputs.run_script }} --shard=${{ matrix.shard }}/4 # pass shard as argument to test script
+      shard_name: shard-${{ matrix.shard }}
     secrets: inherit
 
   # ------------------------------------------------------------------
-  # 2. Merge allure results and publish report
+  # 3. Merge allure results and publish report
   # ------------------------------------------------------------------
   publish-report:
     runs-on: ubuntu-latest
