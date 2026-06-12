@@ -38,7 +38,7 @@ const config: PlaywrightTestConfig = defineConfig({
   retries: process.env.CI ? 1 : 0,
   timeout: 120000, // overall timeout for each test
   expect: {
-    timeout: 13000, //timeout for expect assertions
+    timeout: 4000, //timeout for expect assertions
   },
   fullyParallel: true,
   workers: process.env.CI ? 4 : 8,
@@ -74,8 +74,8 @@ const config: PlaywrightTestConfig = defineConfig({
   ],
 
   use: {
-    actionTimeout: 12000,
-    navigationTimeout: 60000,
+    actionTimeout: 4000,
+    navigationTimeout: 6000,
     trace: 'on-first-retry', // record traces on first retry of each test // disabled temporarily
     screenshot: 'only-on-failure', // save screenshots on failure
     locale: 'de-DE',

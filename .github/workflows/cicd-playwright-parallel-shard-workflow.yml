@@ -28,27 +28,21 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
 
-      - name: Build the Docker Image
-        uses: docker/build-push-action@v7.2.0
-        with:
-          context: .
-          file: Dockerfile
-          no-cache: true
-          push: false
-          tags: playwright-test:${{ github.run_id }}
+      - name: Pull Docker Image from GHCR
+        run: docker pull ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
 
       - name: Run Playwright Tests in Docker Container
         run: |
           docker run --name ${{ github.run_id }}-${{ inputs.shard_name }} \
             -e CI=true \
-            playwright-test:${{ github.run_id }} \
+            ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }} \
             npm run ${{ inputs.run_script }}
 
       - name: Copy Test Reports from Container to Host
         if: always()
         run: |
           docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/allure-results/ ./
-          docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/test-results/ ./
+        # docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/test-results/ ./
 
       - name: Upload Allure Results Artifact
         if: always()
@@ -57,6 +51,7 @@ jobs:
           name: allure-results-${{ github.run_id }}-${{ inputs.shard_name }}
           path: allure-results/
           retention-days: 7
+          if-no-files-found: warn
 
       # ------------------------------------------------------------------
       # Cleanup
@@ -71,4 +66,4 @@ jobs:
 
       - name: Remove Docker Image
         if: always()
-        run: docker rmi -f playwright-test:${{ github.run_id }}
+        run: docker rmi -f ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
