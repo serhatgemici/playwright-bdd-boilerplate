@@ -69,25 +69,47 @@ jobs:
       - name: Pull Docker Image from GHCR
         run: docker pull ${{ needs.build-image.outputs.image_tag }}
 
-      - name: Debug Container & Count Tests
+      - name: Count Total Tests & Generate Matrix
+        id: set-matrix
         env:
+          TESTS_PER_SHARD: ${{ github.event.inputs.tests_per_shard || '40' }}
+          ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
           IMAGE: ${{ needs.build-image.outputs.image_tag }}
         run: |
-          echo "=== 1. Working directory ==="
-          docker run --rm -e CI=true "$IMAGE" sh -c "pwd"
+          TOTAL_TESTS=$(docker run --rm \
+            -e CI=true \
+            "$IMAGE" \
+            sh -c "npx bddgen > /dev/null 2>&1 && grep -r '^test(' /app/.features-gen/ --include='*.js' 2>/dev/null | wc -l" \
+          | tr -d ' \n')
 
-          echo "=== 2. Root filesystem ==="
-          docker run --rm -e CI=true "$IMAGE" sh -c "ls -la /"
+          echo "TOTAL_TESTS=$TOTAL_TESTS"
 
-          echo "=== 3. bddgen raw output ==="
-          docker run --rm -e CI=true "$IMAGE" sh -c "npx bddgen"
+          if [ -z "$TOTAL_TESTS" ] || [ "$TOTAL_TESTS" -eq 0 ]; then
+            echo "ERROR: Could not determine test count. Got: '$TOTAL_TESTS'"
+            exit 1
+          fi
 
-          echo "=== 4. Find all .js files after bddgen ==="
-          docker run --rm -e CI=true "$IMAGE" sh -c "npx bddgen > /dev/null 2>&1 && find / -name '*.spec.js' 2>/dev/null | head -20"
+          SHARD_COUNT=$(( (TOTAL_TESTS + TESTS_PER_SHARD - 1) / TESTS_PER_SHARD ))
+          SHARD_COUNT=$(( SHARD_COUNT < 1 ? 1 : SHARD_COUNT ))
+          SHARD_COUNT=$(( SHARD_COUNT > 4 ? 4 : SHARD_COUNT ))
 
-          echo "=== 5. grep result ==="
-          docker run --rm -e CI=true "$IMAGE" sh -c "npx bddgen > /dev/null 2>&1 && grep -r '^test(' / --include='*.js' 2>/dev/null | head -20"
+          echo "SHARD_COUNT=$SHARD_COUNT"
 
+          if [ "$SHARD_COUNT" -eq 1 ]; then
+            MATRIX=$(jq -cn --arg env "$ENVIRONMENT" \
+              '[{"shardName": "Shard1", "run_script": ("test:" + $env)}]')
+          else
+            MATRIX=$(jq -cn \
+              --argjson count "$SHARD_COUNT" \
+              --arg env "$ENVIRONMENT" \
+              '[range(1; $count + 1) | {
+                "shardName": ("Shard" + (. | tostring)),
+                "run_script": ("test:" + $env + ":shard" + (. | tostring))
+              }]')
+          fi
+
+          echo "Matrix: $MATRIX"
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
   # ------------------------------------------------------------------
   # 3. Run parallel shards (count determined dynamically)
   # ------------------------------------------------------------------
