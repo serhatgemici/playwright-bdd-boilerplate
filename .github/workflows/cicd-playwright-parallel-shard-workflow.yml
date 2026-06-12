@@ -42,7 +42,7 @@ jobs:
         if: always()
         run: |
           docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/allure-results/ ./
-          docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/test-results/ ./
+        # docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/test-results/ ./
 
       - name: Upload Allure Results Artifact
         if: always()

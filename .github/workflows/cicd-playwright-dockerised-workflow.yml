@@ -79,7 +79,7 @@ jobs:
         if: always()
         run: |
           docker cp ${{ github.run_id }}:/app/allure-results/ ./
-          docker cp ${{ github.run_id }}:/app/test-results/ ./
+        # docker cp ${{ github.run_id }}:/app/test-results/ ./
       # ------------------------------------------------------------------
       # ------------------------------------------------------------------
       # - name: Upload Test Reports as Artifacts
@@ -103,7 +103,7 @@ jobs:
           persist-credentials: false
 
       - name: Build test report
-        uses: simple-elf/allure-report-action@master
+        uses: simple-elf/allure-report-action@v1.14
         if: always()
         id: allure-report
         with:
