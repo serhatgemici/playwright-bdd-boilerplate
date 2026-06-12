@@ -79,8 +79,8 @@ jobs:
           TOTAL_TESTS=$(docker run --rm \
             -e CI=true \
             "$IMAGE" \
-            sh -c "npx bddgen > /dev/null 2>&1 && grep -r '^test(' /app/.features-gen/ --include='*.js' 2>/dev/null | wc -l" \
-          | tr -d ' \n')
+            sh -c "npx bddgen > /dev/null 2>&1 && npx playwright test --list --project=Develop 2>/dev/null" \
+          | grep '^Total:' | awk '{print $2}')
 
           echo "TOTAL_TESTS=$TOTAL_TESTS"
 
