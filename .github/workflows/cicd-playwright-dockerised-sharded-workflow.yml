@@ -47,9 +47,9 @@ jobs:
           cache-from: type=gha,scope=${{ github.ref_name }}-playwright
           cache-to: type=gha,mode=max,scope=${{ github.ref_name }}-playwright
 
-  # ------------------------------------------------------------------
-  # 2. Count tests and compute dynamic shard matrix
-  # ------------------------------------------------------------------
+      # ------------------------------------------------------------------
+      # 2. Count tests and compute dynamic shard matrix
+      # ------------------------------------------------------------------
   compute-shards:
     needs: build-image
     runs-on: ubuntu-latest
@@ -58,7 +58,6 @@ jobs:
       packages: read
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-      shard_count: ${{ steps.set-matrix.outputs.shard_count }}
     steps:
       - name: Login to Docker Registry
         uses: docker/login-action@v4.2.0
@@ -70,42 +69,55 @@ jobs:
       - name: Pull Docker Image from GHCR
         run: docker pull ${{ needs.build-image.outputs.image_tag }}
 
-      - name: Count Total Tests
-        id: count-tests
-        run: |
-          # Run bddgen first to generate test files, then list tests
-          TOTAL_TESTS=$(docker run --rm \
-            -e CI=true \
-            ${{ needs.build-image.outputs.image_tag }} \
-            sh -c "npx bddgen && npx playwright test --list --project=Develop 2>/dev/null | grep -c 'test'" \
-          )
-          echo "Total tests found: $TOTAL_TESTS"
-          echo "total_tests=$TOTAL_TESTS" >> "$GITHUB_OUTPUT"
-
-      - name: Generate Shard Matrix
+      - name: Count Total Tests & Generate Matrix
         id: set-matrix
         env:
           TESTS_PER_SHARD: ${{ github.event.inputs.tests_per_shard || '40' }}
           ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
-          TOTAL_TESTS: ${{ steps.count-tests.outputs.total_tests }}
+          IMAGE: ${{ needs.build-image.outputs.image_tag }}
         run: |
-          SHARD_COUNT=$(( (TOTAL_TESTS + TESTS_PER_SHARD - 1) / TESTS_PER_SHARD ))
-          # Minimum 1, maximum 10 shard
-          SHARD_COUNT=$(( SHARD_COUNT < 1 ? 1 : SHARD_COUNT ))
-          SHARD_COUNT=$(( SHARD_COUNT > 10 ? 10 : SHARD_COUNT ))
-          echo "Computed shard count: $SHARD_COUNT"
+          # 1. Run bddgen inside container, then count test( lines in .features-gen/
+          TOTAL_TESTS=$(docker run --rm \
+            -e CI=true \
+            "$IMAGE" \
+            sh -c "npx bddgen > /dev/null 2>&1 && grep -r '^test(' .features-gen/ --include='*.js' | wc -l" \
+          | tr -d ' \n')
 
-          # Generate matrix: [{"shardName":"Shard1","run_script":"test:dev:shard1"}, ...]
-          MATRIX=$(jq -cn \
-            --argjson count "$SHARD_COUNT" \
-            --arg env "$ENVIRONMENT" \
-            '[range(1; $count + 1) | {
-              "shardName": ("Shard" + (. | tostring)),
-              "run_script": ("test:" + $env + ":shard" + (. | tostring))
-            }]'
-          )
+          echo "TOTAL_TESTS=$TOTAL_TESTS"
+
+          # 2. Guard: if count is 0 or empty, fail loudly
+          if [ -z "$TOTAL_TESTS" ] || [ "$TOTAL_TESTS" -eq 0 ]; then
+            echo "ERROR: Could not determine test count. Got: '$TOTAL_TESTS'"
+            exit 1
+          fi
+
+          # 3. Compute shard count — ceiling division
+          SHARD_COUNT=$(( (TOTAL_TESTS + TESTS_PER_SHARD - 1) / TESTS_PER_SHARD ))
+          SHARD_COUNT=$(( SHARD_COUNT < 1 ? 1 : SHARD_COUNT ))
+          SHARD_COUNT=$(( SHARD_COUNT > 4 ? 4 : SHARD_COUNT ))  # cap at 4 (package.json has shard1-4)
+
+          echo "SHARD_COUNT=$SHARD_COUNT"
+
+          # 4. Generate matrix JSON
+          # If only 1 shard → use base script (test:dev), NOT test:dev:shard1
+          # If multiple shards → use test:dev:shard1, test:dev:shard2, etc.
+          if [ "$SHARD_COUNT" -eq 1 ]; then
+            MATRIX=$(jq -cn --arg env "$ENVIRONMENT" \
+              '[{"shardName": "Shard1", "run_script": ("test:" + $env)}]'
+            )
+          else
+            MATRIX=$(jq -cn \
+              --argjson count "$SHARD_COUNT" \
+              --arg env "$ENVIRONMENT" \
+              '[range(1; $count + 1) | {
+                "shardName": ("Shard" + (. | tostring)),
+                "run_script": ("test:" + $env + ":shard" + (. | tostring))
+              }]'
+            )
+          fi
+
+          echo "Matrix: $MATRIX"
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
-          echo "shard_count=$SHARD_COUNT" >> "$GITHUB_OUTPUT"
 
   # ------------------------------------------------------------------
   # 3. Run parallel shards (count determined dynamically)
