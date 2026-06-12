@@ -9,7 +9,7 @@ on:
       tests_per_shard:
         description: 'Max number of tests per shard'
         required: false
-        default: '10'
+        default: '1'
       environment:
         description: 'Test environment (dev, stage, prod)'
         required: false
@@ -58,7 +58,7 @@ jobs:
       - name: Count Tests & Generate Matrix
         id: set-matrix
         env:
-          TESTS_PER_SHARD: ${{ github.event.inputs.tests_per_shard || '10' }}
+          TESTS_PER_SHARD: ${{ github.event.inputs.tests_per_shard || '1' }}
           ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
           IMAGE: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
         run: |
