@@ -95,11 +95,11 @@ jobs:
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
       - name: Push Docker Image to GHCR
-        if: ${{ fromJson(needs.build-image.outputs.shard_count) > 1 }}
+        if: steps.set-matrix.outputs.shard_count != '1'
         run: docker push ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
 
       - name: Run Tests Directly (Single Shard)
-        if: ${{ fromJson(needs.build-image.outputs.shard_count) == 1 }}
+        if: steps.set-matrix.outputs.shard_count == '1'
         env:
           IMAGE: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
           ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
@@ -110,12 +110,12 @@ jobs:
             npm run test:$ENVIRONMENT
 
       - name: Copy Test Reports (Single Shard)
-        if: ${{ fromJson(needs.build-image.outputs.shard_count) == 1 && always() }}
+        if: steps.set-matrix.outputs.shard_count == '1' && always()
         run: |
           docker cp single-shard:/app/allure-results/ ./allure-results/
 
       - name: Upload Allure Results (Single Shard)
-        if: ${{ fromJson(needs.build-image.outputs.shard_count) == 1 && always() }}
+        if: steps.set-matrix.outputs.shard_count == '1' && always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-${{ github.run_id }}-Shard1
@@ -123,7 +123,7 @@ jobs:
           retention-days: 7
 
       - name: Cleanup Single Shard Container
-        if: ${{ fromJson(needs.build-image.outputs.shard_count) == 1 && always() }}
+        if: steps.set-matrix.outputs.shard_count == '1' && always()
         run: docker rm single-shard
 
   # ------------------------------------------------------------------
@@ -131,7 +131,7 @@ jobs:
   # ------------------------------------------------------------------
   run-shard-tests:
     needs: [build-image]
-    if: ${{ fromJson(needs.build-image.outputs.shard_count) > 1 }}
+    if: needs.build-image.outputs.shard_count != '1'
     strategy:
       fail-fast: false
       matrix:
