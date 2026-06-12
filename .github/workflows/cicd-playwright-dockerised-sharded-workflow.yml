@@ -95,18 +95,14 @@ jobs:
           echo "SHARD_COUNT=$SHARD_COUNT"
           echo "shard_count=$SHARD_COUNT" >> "$GITHUB_OUTPUT"
 
-          if [ "$SHARD_COUNT" -eq 1 ]; then
-            MATRIX=$(jq -cn --arg env "$ENVIRONMENT" \
-              '[{"shardName": "Shard1", "run_script": ("test:" + $env)}]')
-          else
-            MATRIX=$(jq -cn \
-              --argjson count "$SHARD_COUNT" \
-              --arg env "$ENVIRONMENT" \
-              '[range(1; $count + 1) | {
-                "shardName": ("Shard" + (. | tostring)),
-                "run_script": ("test:" + $env + ":shard" + (. | tostring))
-              }]')
-          fi
+          # Matrix: her entry shardName + index + total
+          MATRIX=$(jq -cn \
+            --argjson count "$SHARD_COUNT" \
+            '[range(1; $count + 1) | {
+              "shardName": ("Shard" + (. | tostring)),
+              "index": .,
+              "total": $count
+            }]')
 
           echo "Matrix: $MATRIX"
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
@@ -155,8 +151,11 @@ jobs:
         include: ${{ fromJson(needs.build-and-dispatch-tests.outputs.matrix) }}
     uses: ./.github/workflows/cicd-playwright-parallel-shard-workflow.yml
     with:
-      run_script: ${{ matrix.run_script }}
+      # Base script: test:<environment>, shard index/total CLI ile geçilecek
+      run_script: test:${{ github.event.inputs.environment || 'dev' }}
       shard_name: ${{ matrix.shardName }}
+      shard_index: ${{ matrix.index }}
+      shard_total: ${{ matrix.total }}
     secrets: inherit
 
   # ------------------------------------------------------------------

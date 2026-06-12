@@ -9,6 +9,12 @@ on:
       shard_name:
         required: true
         type: string
+      shard_index:
+        required: true
+        type: number
+      shard_total:
+        required: true
+        type: number
 
 jobs:
   run-tests:
@@ -36,13 +42,12 @@ jobs:
           docker run --name ${{ github.run_id }}-${{ inputs.shard_name }} \
             -e CI=true \
             ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }} \
-            npm run ${{ inputs.run_script }}
+            sh -c "npm run ${{ inputs.run_script }} -- --shard=${{ inputs.shard_index }}/${{ inputs.shard_total }}"
 
       - name: Copy Test Reports from Container to Host
         if: always()
         run: |
-          docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/allure-results/ ./
-        # docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/test-results/ ./
+          docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/allure-results/ ./allure-results/
 
       - name: Upload Allure Results Artifact
         if: always()
