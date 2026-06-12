@@ -41,8 +41,8 @@ jobs:
       - name: Copy Test Reports from Container to Host
         if: always()
         run: |
-          docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/allure-results/ ./
-          docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/test-results/ ./
+          docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/allure-results/ ./ || echo "allure-results not found"
+          docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/test-results/ ./ || echo "test-results not found"
 
       - name: Upload Allure Results Artifact
         if: always()
@@ -51,6 +51,7 @@ jobs:
           name: allure-results-${{ github.run_id }}-${{ inputs.shard_name }}
           path: allure-results/
           retention-days: 7
+          if-no-files-found: warn
 
       # ------------------------------------------------------------------
       # Cleanup
