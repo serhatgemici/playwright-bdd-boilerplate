@@ -38,14 +38,14 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
 
+      - name: Pre-pull Base Image
+        run: |
+          docker pull ghcr.io/serhatgemici/playwright-test:latest
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.1.0
         with:
           driver: docker
-
-      - name: Pre-pull & Cache Base Image
-        run: |
-          docker pull ghcr.io/serhatgemici/playwright-test:latest
 
       - name: Build & Load Docker Image
         uses: docker/build-push-action@v7.2.0
@@ -217,4 +217,3 @@ jobs:
           state: ${{ needs.dynamic-paralellization.result == 'success' || needs.build-and-dispatch.result == 'success' && 'success' || 'failure' }}
           sha: ${{ github.event.pull_request.head.sha || github.sha }}
           target_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
-#deneme
