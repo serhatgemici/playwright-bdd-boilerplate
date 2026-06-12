@@ -11,7 +11,7 @@ on:
         required: false
         default: '40'
       environment:
-        description: 'Test environment (dev, stage, local)'
+        description: 'Test environment (dev, stage, prod)'
         required: false
         default: 'dev'
 
