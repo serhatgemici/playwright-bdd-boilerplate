@@ -1,1 +1,0 @@
-[{"uid":"fc8a6976e38a02ef","name":"TC3 - Login attempt with incorrect email and password","time":{"start":1781276246008,"stop":1781276250894,"duration":4886},"status":"failed","severity":"normal"},{"uid":"5857effbbc3d171e","name":"TC2 - Login with valid email and password","time":{"start":1781276246261,"stop":1781276251177,"duration":4916},"status":"failed","severity":"normal"}]

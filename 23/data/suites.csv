@@ -1,3 +1,0 @@
-"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","4886","TC3 - Login attempt with incorrect email and password","Develop","2026-06-12","failed","2026-06-12","User Login and Logout","e2e/Features/@Login.feature.spec.js","",""
-"","4916","TC2 - Login with valid email and password","Develop","2026-06-12","failed","2026-06-12","User Login and Logout","e2e/Features/@Login.feature.spec.js","",""
