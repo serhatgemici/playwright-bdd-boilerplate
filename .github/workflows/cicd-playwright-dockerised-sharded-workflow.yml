@@ -19,7 +19,7 @@ jobs:
   # ------------------------------------------------------------------
   # 1. Build Docker image + compute shard matrix
   # ------------------------------------------------------------------
-  build-and-dispatch:
+  build-and-dispatch-tests:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -147,12 +147,12 @@ jobs:
   # 2. Run parallel shards (only if more than 1 shard) using reusable workflow
   # ------------------------------------------------------------------
   dynamic-paralellization:
-    needs: [build-and-dispatch]
-    if: needs.build-and-dispatch.outputs.shard_count != '1'
+    needs: [build-and-dispatch-tests]
+    if: needs.build-and-dispatch-tests.outputs.shard_count != '1'
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJson(needs.build-and-dispatch.outputs.matrix) }}
+        include: ${{ fromJson(needs.build-and-dispatch-tests.outputs.matrix) }}
     uses: ./.github/workflows/cicd-playwright-parallel-shard-workflow.yml
     with:
       run_script: ${{ matrix.run_script }}
@@ -164,7 +164,7 @@ jobs:
   # ------------------------------------------------------------------
   publish-report:
     runs-on: ubuntu-latest
-    needs: [build-and-dispatch, dynamic-paralellization]
+    needs: [build-and-dispatch-tests, dynamic-paralellization]
     if: always()
     permissions:
       contents: write
@@ -214,6 +214,6 @@ jobs:
         with:
           authToken: ${{ github.token }}
           context: 'Allure Test Report'
-          state: ${{ needs.dynamic-paralellization.result == 'success' || needs.build-and-dispatch.result == 'success' && 'success' || 'failure' }}
+          state: ${{ needs.dynamic-paralellization.result == 'success' || needs.build-and-dispatch-tests.result == 'success' && 'success' || 'failure' }}
           sha: ${{ github.event.pull_request.head.sha || github.sha }}
           target_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
