@@ -5,7 +5,7 @@ FROM node:20-bookworm AS base
 WORKDIR /app
 
 # Install Playwright
-RUN npm install @playwright/test@1.60.0
+RUN npm install @playwright/test@latest
 
 # Install dependencies for Playwright browsers
 RUN npx playwright install-deps
