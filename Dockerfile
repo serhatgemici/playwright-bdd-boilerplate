@@ -1,6 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.60.0-noble AS app
-
-WORKDIR /app
+FROM ghcr.io/serhatgemici/playwright-test:latest AS app
 
 # Copy package files and install dependencies
 COPY package.json package-lock.json* ./
