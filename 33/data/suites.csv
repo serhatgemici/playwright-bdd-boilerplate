@@ -1,0 +1,7 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","23201","TC1 - Register a new user successfully","Develop","2026-06-12","passed","2026-06-12","User Registration","e2e/Features/@Registration.feature.spec.js","",""
+"","8305","TC4 - Logout user","Develop","2026-06-12","passed","2026-06-12","User Login and Logout","e2e/Features/@Login.feature.spec.js","",""
+"","6645","TC5 - Attempting to register a new user with an already registered email address","Develop","2026-06-12","passed","2026-06-12","User Registration","e2e/Features/@Registration.feature.spec.js","",""
+"","11405","TC2 - Login with valid email and password","Develop","2026-06-12","passed","2026-06-12","User Login and Logout","e2e/Features/@Login.feature.spec.js","",""
+"","9261","TC2 - Delete a registered account","Develop","2026-06-12","passed","2026-06-12","User Registration","e2e/Features/@Registration.feature.spec.js","",""
+"","9505","TC3 - Login attempt with incorrect email and password","Develop","2026-06-12","passed","2026-06-12","User Login and Logout","e2e/Features/@Login.feature.spec.js","",""
