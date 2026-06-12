@@ -40,6 +40,8 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.1.0
+        with:
+          driver: docker
 
       - name: Pre-pull & Cache Base Image
         run: |
@@ -52,10 +54,6 @@ jobs:
           push: false
           load: true
           tags: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=playwright-${{ hashFiles('package-lock.json') }}
-            type=gha,scope=playwright-base
-          cache-to: type=gha,mode=max,scope=playwright-${{ hashFiles('package-lock.json') }}
 
       - name: Count Tests & Generate Matrix
         id: set-matrix
