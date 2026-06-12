@@ -56,10 +56,14 @@ jobs:
       # ------------------------------------------------------------------
       # Cleanup
       # ------------------------------------------------------------------
+      - name: Stop Docker Container
+        if: always()
+        run: docker stop ${{ github.run_id }}-${{ inputs.shard_name }}
+
       - name: Remove Docker Container
         if: always()
-        run: docker rm ${{ github.run_id }}-${{ inputs.shard_name }} || true
+        run: docker rm ${{ github.run_id }}-${{ inputs.shard_name }}
 
       - name: Remove Docker Image
         if: always()
-        run: docker rmi -f ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }} || true
+        run: docker rmi -f ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
