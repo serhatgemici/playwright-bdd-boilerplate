@@ -17,7 +17,7 @@ on:
 
 jobs:
   # ------------------------------------------------------------------
-  # 1. Build Docker image once for all shards
+  # 1. Build Docker image + compute shard matrix
   # ------------------------------------------------------------------
   build-image:
     runs-on: ubuntu-latest
@@ -40,11 +40,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.1.0
 
-      - name: Build, Push & Load Docker Image
+      - name: Build & Load Docker Image
         uses: docker/build-push-action@v7.2.0
         with:
           context: .
-          push: true
+          push: false
           load: true
           tags: ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
           cache-from: type=gha,scope=${{ github.ref_name }}-playwright
@@ -91,15 +91,19 @@ jobs:
 
           echo "Matrix: $MATRIX"
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+      - name: Push Docker Image to GHCR
+        run: docker push ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
+
   # ------------------------------------------------------------------
-  # 3. Run parallel shards (count determined dynamically)
+  # 2. Run parallel shards (count determined dynamically)
   # ------------------------------------------------------------------
   run-shard-tests:
     needs: [build-image]
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJson(needs.compute-shards.outputs.matrix) }}
+        include: ${{ fromJson(needs.build-image.outputs.matrix) }}
     uses: ./.github/workflows/cicd-playwright-parallel-shard-workflow.yml
     with:
       run_script: ${{ matrix.run_script }}
@@ -107,7 +111,7 @@ jobs:
     secrets: inherit
 
   # ------------------------------------------------------------------
-  # 4. Merge allure results and publish report
+  # 3. Merge allure results and publish report
   # ------------------------------------------------------------------
   publish-report:
     runs-on: ubuntu-latest
