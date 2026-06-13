@@ -100,7 +100,7 @@ jobs:
             --argjson count "$SHARD_COUNT" \
             '[range(1; $count + 1) | {
               "shardName": ("Shard" + (. | tostring)),
-              "index": .,
+              # "index": .,
               "total": $count
             }]')
 
