@@ -1,0 +1,70 @@
+You are an expert in Playwright BDD testing.
+Fix the error in the BDD scenario.
+
+- Provide response as a diff highlighted code snippet.
+- First try to fix test by adjusting Gherkin steps parameters.
+- If test is not fixable by Gherkin, try to modify the code snippet.
+- Strictly rely on the ARIA snapshot of the page.
+- Avoid adding any new code.
+- Avoid adding comments to the code.
+- Avoid changing the test logic.
+- Use only role-based locators: getByRole, getByLabel, etc.
+- Add a concise note about applied changes.
+- If the test may be correct and there is a bug in the page, note it.
+
+Failing gherkin scenario: 
+
+Scenario: TC1 - Register a new user successfully
+  Given user has landed on the homepage
+  When user clicks on "Signup / Login" on the navigation bar
+  Then "New User Signup!" text is "visible"
+  When user enters signup name as "random"
+  And user enters signup email address as "random"
+  And user clicks on "Signup" button
+  Then "ENTER ACCOUNT INFORMATION" text is "visible"
+  When user selects title as "random"
+  And user enters name as "random"
+  And user enters password as "random"
+  And user selects date of birth as "random"
+  And user selects the "newsletter" checkbox
+  And user selects the "special offers" checkbox
+  And user enters first name as "random"
+  And user enters last name as "random"
+  And user enters company as "random"
+  And user enters address as "random"
+  And user enters address2 as "random"
+  And user selects country as "random"
+  And user enters state as "random"
+  And user enters city as "random"
+  And user enters zipcode as "random"
+  And user enters mobile number as "random"
+  And user clicks on "Create Account" button
+  Then "ACCOUNT CREATED!" text is "visible"
+  When user clicks on "Continue" link
+  Then logged in as text displays the full name of the user correctly
+
+Error details:
+Error: expect(locator).toBeVisible() failed
+
+Locator: getByText('Logged in as Sarah Martinez')
+Expected: visible
+Timeout: 4000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 4000ms
+  - waiting for getByText('Logged in as Sarah Martinez')
+
+  async validateLoggedInAsText(fullName: string) {
+    const loggedInAsText = this.page.getByText(`Logged in as ${fullName}`);
+    await expect(loggedInAsText).toBeVisible();
+  }
+}
+
+export default NavigationBar;
+
+ARIA snapshot of the page:
+
+- document:
+  - insertion:
+    - iframe
