@@ -75,11 +75,12 @@ jobs:
 
           echo "PROJECT=$PROJECT"
 
+          # Use jq to safely parse test count
           TOTAL_TESTS=$(docker run --rm \
             -e CI=true \
             "$IMAGE" \
             sh -c "npx bddgen > /dev/null 2>&1 && npx playwright test --list --project=$PROJECT 2>/dev/null" \
-          | grep '^Total:' | awk '{print $2}')
+          | jq -r '.totalTests')
 
           echo "TOTAL_TESTS=$TOTAL_TESTS"
 
@@ -109,7 +110,12 @@ jobs:
 
       - name: Push Docker Image to GHCR
         if: steps.set-matrix.outputs.shard_count != '1'
-        run: docker push ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
+        run: |
+          docker push ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
+          if [ $? -ne 0 ]; then
+            echo "ERROR: Docker image push failed."
+            exit 1
+          fi
 
       - name: Run Tests Directly (Single Shard)
         if: steps.set-matrix.outputs.shard_count == '1'
@@ -215,4 +221,4 @@ jobs:
           context: 'Allure Test Report'
           state: ${{ (needs.dynamic-parallelization.result == 'success' || needs.build-and-dispatch-tests.result == 'success') && 'success' || 'failure' }}
           sha: ${{ github.event.pull_request.head.sha || github.sha }}
-          target_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
+          target_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_id }}
