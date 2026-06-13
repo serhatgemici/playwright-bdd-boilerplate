@@ -5,10 +5,16 @@ on:
     inputs:
       run_script:
         required: true
-        type: string
+        type: string # test:dev / test:stage / test:prod → sadece env bilgisini taşımak için
       shard_name:
         required: true
         type: string
+      shard_index:
+        required: true
+        type: number
+      shard_total:
+        required: true
+        type: number
 
 jobs:
   run-tests:
@@ -31,18 +37,32 @@ jobs:
       - name: Pull Docker Image from GHCR
         run: docker pull ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }}
 
-      - name: Run Playwright Tests in Docker Container
+      - name: Map environment to Playwright project
+        id: project
+        run: |
+          case "${{ inputs.run_script }}" in
+            test:dev)   echo "project=Develop"    >> "$GITHUB_OUTPUT" ;;
+            test:stage) echo "project=Stage"      >> "$GITHUB_OUTPUT" ;;
+            test:prod)  echo "project=Production" >> "$GITHUB_OUTPUT" ;;
+            *)
+              echo "ERROR: Unknown run_script '${{ inputs.run_script }}'. Expected: test:dev|test:stage|test:prod"
+              exit 1
+              ;;
+          esac
+
+      - name: Run Playwright Tests in Docker Container (sharded)
         run: |
           docker run --name ${{ github.run_id }}-${{ inputs.shard_name }} \
             -e CI=true \
             ghcr.io/${{ github.repository }}/playwright-test:${{ github.run_id }} \
-            npm run ${{ inputs.run_script }}
+            sh -c "npx bddgen > /dev/null 2>&1 && npx playwright test \
+                   --project=${{ steps.project.outputs.project }} \
+                   --shard=${{ inputs.shard_index }}/${{ inputs.shard_total }}"
 
       - name: Copy Test Reports from Container to Host
         if: always()
         run: |
-          docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/allure-results/ ./
-        # docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/test-results/ ./
+          docker cp ${{ github.run_id }}-${{ inputs.shard_name }}:/app/allure-results/ ./allure-results/
 
       - name: Upload Allure Results Artifact
         if: always()
