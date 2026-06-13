@@ -75,12 +75,11 @@ jobs:
 
           echo "PROJECT=$PROJECT"
 
-          # Use jq to safely parse test count
           TOTAL_TESTS=$(docker run --rm \
             -e CI=true \
             "$IMAGE" \
             sh -c "npx bddgen > /dev/null 2>&1 && npx playwright test --list --project=$PROJECT 2>/dev/null" \
-          | jq -r '.totalTests')
+          | grep '^Total:' | awk '{print $2}')
 
           echo "TOTAL_TESTS=$TOTAL_TESTS"
 
