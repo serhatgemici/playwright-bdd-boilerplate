@@ -100,7 +100,7 @@ jobs:
             --argjson count "$SHARD_COUNT" \
             '[range(1; $count + 1) | {
               "shardName": ("Shard" + (. | tostring)),
-              # "index": .,
+              "index": .,
               "total": $count
             }]')
 
@@ -148,6 +148,7 @@ jobs:
   # 2. Run parallel shards (only if more than 1 shard) using reusable workflow
   # ------------------------------------------------------------------
   dynamic-parallelization:
+    name: Shard ${{ matrix.index }}/${{ matrix.total }}
     needs: [build-and-dispatch-tests]
     if: needs.build-and-dispatch-tests.outputs.shard_count != '1'
     strategy:
